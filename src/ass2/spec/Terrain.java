@@ -158,20 +158,37 @@ public class Terrain {
      */
     public void display(GL2 gl) {
         
-//        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
+//        float[] a = new float[4];
+//        a[0] = a[1] = a[2] = 0.2f;
+//        a[3] = 1.0f;
+//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, a, 0);
+//
+//        float[] d = new float[4];
+//        d[0] = d[1] = d[2] = 0.5f;
+//        d[3] = 1.0f;
+//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, d, 0);
+//
+//        float[] s = new float[4];
+//        s[0] = s[1] = s[2] = 0.2f;
+//        s[3] = 1.0f;
+//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, s, 0);
+
         gl.glBegin(GL.GL_TRIANGLES);
         {
             for (int x = 0; x < size.getHeight() - 1; x++) {
                 for (int y = 0; y < size.getWidth() - 1; y++) {
-//                    gl.glVertex3d(x, this.getAltitude(x, z), z);
-//                    gl.glVertex3d(x + 1, this.getAltitude(x + 1, z), z);
-//                    gl.glVertex3d(x, this.getAltitude(x, z + 1), z);
-                    gl.glColor4f(0, 0, 1, 1);
+                    double[] v1 = MathHelper.getVector(x, y, this.getAltitude(x, y), x + 1, y, this.getAltitude(x + 1, y));
+                    double[] v2 = MathHelper.getVector(x, y, this.getAltitude(x, y), x, y + 1, this.getAltitude(x, y + 1));
+                    double[] normal = MathHelper.crossProduct(v1, v2);
+                    gl.glNormal3d(normal[0], normal[1], normal[2]);
                     gl.glVertex3d(x, y, this.getAltitude(x, y));
                     gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
                     
-                    gl.glColor4f(1, 0, 0, 1);
+                    v1 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x + 1, y, this.getAltitude(x + 1, y));
+                    v2 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x, y + 1, this.getAltitude(x, y + 1));
+                    normal = MathHelper.crossProduct(v1, v2);
+                    gl.glNormal3d(normal[0], normal[1], normal[2]);
                     gl.glVertex3d(x + 1, y + 1, this.getAltitude(x + 1, y + 1));
                     gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));

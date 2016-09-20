@@ -69,14 +69,26 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	public void display(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
 	    
+	    // Makes sure that the objects are drawn in the right order
+	    gl.glEnable(GL2.GL_DEPTH_TEST);
 	    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+
+	    // Disabled by default
+	    // To turn on culling:
+	    gl.glEnable(GL2.GL_CULL_FACE);
+	    gl.glCullFace(GL2.GL_BACK);
+	    
         
         // enable lighting
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_LIGHT0);
         gl.glEnable(GL2.GL_NORMALIZE);
 
+        float[] pos = { 5, 5, 5, 1 };
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, pos, 0);
         
+        float[] amb = {0.1f, 0.2f, 0.3f, 1.0f};
+        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, amb, 0);
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    
@@ -84,32 +96,18 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 //	    gl.glFrustum(-1, 11, -1, 11, 1, 5);
 //	    gl.glRotated(30, 0, 1, 0);
 //	    gl.glOrtho(0, this.terrain.size().getWidth(), 0, this.terrain.size().getHeight(), 1, 10);
-	    gl.glOrtho(0, 12, 0, 12, 0, -2);
-//	    GLU glu = new GLU();
-//	    glu.gluLookAt(0, 0, 5, 5, 5, 0, 0, 1, 1);
-	    gl.glRotated(90, 1, 0, 0);
+//	    gl.glOrtho(0, 12, 0, 12, 0, -2);
+	    GLU glu = new GLU();
+	    glu.gluPerspective(60, 1, 1, 100);
+	    glu.gluLookAt(5 + dx, dy, 5 + dz, 5, 5, 0, 0, 1, 0);
+//	    gl.glRotated(90, 1, 0, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
-	    gl.glTranslated(dx, dy, dz);
+//	    gl.glTranslated(dx, dy, dz);
 
         this.terrain.display(gl);
 	}
-
-	private void setCamera(GL2 gl, GLU glu, float distance) {
-        // Change to projection matrix.
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        // Perspective.
-        float widthHeightRatio = (float) getWidth() / (float) getHeight();
-        glu.gluPerspective(45, widthHeightRatio, 1, 1000);
-        glu.gluLookAt(0, 0, distance, 0, 0, 0, 0, 1, 0);
-
-        // Change back to model view matrix.
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-    }
 
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
@@ -135,6 +133,13 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
     public void keyPressed(KeyEvent e) {
          switch (e.getKeyCode())
          {
+             // Reset variables
+             case KeyEvent.VK_R:
+                 dx = 0;
+                 dy = 0;
+                 dz = 0;
+                 break;
+             
              case KeyEvent.VK_RIGHT:
                  dx += 1;
                  break;
