@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+
 
 
 /**
@@ -13,11 +16,11 @@ import java.util.List;
  */
 public class Terrain {
 
-    private Dimension mySize;
-    private double[][] myAltitude;
-    private List<Tree> myTrees;
-    private List<Road> myRoads;
-    private float[] mySunlight;
+    private Dimension size;
+    private double[][] altitude;
+    private List<Tree> trees;
+    private List<Road> roads;
+    private float[] sunlight;
 
     /**
      * Create a new terrain
@@ -26,11 +29,11 @@ public class Terrain {
      * @param depth The number of vertices in the z-direction
      */
     public Terrain(int width, int depth) {
-        mySize = new Dimension(width, depth);
-        myAltitude = new double[width][depth];
-        myTrees = new ArrayList<Tree>();
-        myRoads = new ArrayList<Road>();
-        mySunlight = new float[3];
+        this.size = new Dimension(width, depth);
+        this.altitude = new double[width][depth];
+        this.trees = new ArrayList<Tree>();
+        this.roads = new ArrayList<Road>();
+        this.sunlight = new float[3];
     }
     
     public Terrain(Dimension size) {
@@ -38,19 +41,19 @@ public class Terrain {
     }
 
     public Dimension size() {
-        return mySize;
+        return this.size;
     }
 
     public List<Tree> trees() {
-        return myTrees;
+        return this.trees;
     }
 
     public List<Road> roads() {
-        return myRoads;
+        return this.roads;
     }
 
     public float[] getSunlight() {
-        return mySunlight;
+        return this.sunlight;
     }
 
     /**
@@ -63,9 +66,9 @@ public class Terrain {
      * @param dz
      */
     public void setSunlightDir(float dx, float dy, float dz) {
-        mySunlight[0] = dx;
-        mySunlight[1] = dy;
-        mySunlight[2] = dz;        
+        this.sunlight[0] = dx;
+        this.sunlight[1] = dy;
+        this.sunlight[2] = dz;        
     }
     
     /**
@@ -75,13 +78,13 @@ public class Terrain {
      * @param height
      */
     public void setSize(int width, int height) {
-        mySize = new Dimension(width, height);
-        double[][] oldAlt = myAltitude;
-        myAltitude = new double[width][height];
+        this.size = new Dimension(width, height);
+        double[][] oldAlt = this.altitude;
+        this.altitude = new double[width][height];
         
         for (int i = 0; i < width && i < oldAlt.length; i++) {
             for (int j = 0; j < height && j < oldAlt[i].length; j++) {
-                myAltitude[i][j] = oldAlt[i][j];
+                this.altitude[i][j] = oldAlt[i][j];
             }
         }
     }
@@ -94,7 +97,7 @@ public class Terrain {
      * @return
      */
     public double getGridAltitude(int x, int z) {
-        return myAltitude[x][z];
+        return this.altitude[x][z];
     }
 
     /**
@@ -105,7 +108,7 @@ public class Terrain {
      * @return
      */
     public void setGridAltitude(int x, int z, double h) {
-        myAltitude[x][z] = h;
+        this.altitude[x][z] = h;
     }
 
     /**
@@ -118,11 +121,9 @@ public class Terrain {
      * @param z
      * @return
      */
-    public double altitude(double x, double z) {
+    public double getAltitude(double x, double z) {
         double altitude = 0;
-
-        
-        
+        altitude = this.altitude[(int) x][(int) z];
         return altitude;
     }
 
@@ -134,9 +135,9 @@ public class Terrain {
      * @param z
      */
     public void addTree(double x, double z) {
-        double y = altitude(x, z);
+        double y = getAltitude(x, z);
         Tree tree = new Tree(x, y, z);
-        myTrees.add(tree);
+        this.trees.add(tree);
     }
 
 
@@ -148,8 +149,38 @@ public class Terrain {
      */
     public void addRoad(double width, double[] spine) {
         Road road = new Road(width, spine);
-        myRoads.add(road);        
+        this.roads.add(road);
     }
 
+    /**
+     * Draw the terrain in the world
+     * @param gl
+     */
+    public void display(GL2 gl) {
+        
+//        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+            for (int x = 0; x < size.getHeight() - 1; x++) {
+                for (int y = 0; y < size.getWidth() - 1; y++) {
+//                    gl.glVertex3d(x, this.getAltitude(x, z), z);
+//                    gl.glVertex3d(x + 1, this.getAltitude(x + 1, z), z);
+//                    gl.glVertex3d(x, this.getAltitude(x, z + 1), z);
+                    gl.glColor4f(0, 0, 1, 1);
+                    gl.glVertex3d(x, y, this.getAltitude(x, y));
+                    gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
+                    gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
+                    
+                    gl.glColor4f(1, 0, 0, 1);
+                    gl.glVertex3d(x + 1, y + 1, this.getAltitude(x + 1, y + 1));
+                    gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
+                    gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
+                
+                }
+            }
+        }
+        gl.glEnd();
+    }
 
+    
 }
