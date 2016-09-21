@@ -6,21 +6,27 @@ import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 
 
 
 /**
  * COMMENT: Comment HeightMap 
  *
- * @author malcolmr
+ * @author Oliver Fleckenstein
  */
 public class Terrain {
-
+    
+    // Textures
+    private String textureFileName1 = "src/textures/tileable_grass_00.png";
+    private String textureExt1 = "png";
+    
     private Dimension size;
     private double[][] altitude;
     private List<Tree> trees;
     private List<Road> roads;
     private float[] sunlight;
+    private Texture[] textures;
 
     /**
      * Create a new terrain
@@ -156,7 +162,12 @@ public class Terrain {
      * Draw the terrain in the world
      * @param gl
      */
-    public void display(GL2 gl) {
+    public void display(GL2 gl) 
+    {
+        // Load the texture
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[0].getTextureId());
+        
+        // Draw the terrain
         for (int x = 0; x < size.getHeight() - 1; x++) {
             for (int y = 0; y < size.getWidth() - 1; y++) {
                 double[] v1 = MathHelper.getVector(x, y, this.getAltitude(x, y), x + 1, y, this.getAltitude(x + 1, y));
@@ -174,8 +185,11 @@ public class Terrain {
                 gl.glBegin(GL2.GL_TRIANGLES);
                 {
                     gl.glNormal3d(normal[0], normal[1], normal[2]);
+                    gl.glTexCoord2d(0, 0);
                     gl.glVertex3d(x, y, this.getAltitude(x, y));
+                    gl.glTexCoord2d(1, 0);
                     gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
+                    gl.glTexCoord2d(0.5, 1);
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
                 }
                 gl.glEnd();
@@ -194,13 +208,24 @@ public class Terrain {
                 gl.glBegin(GL2.GL_TRIANGLES);
                 {
                     gl.glNormal3d(normal[0], normal[1], normal[2]);
+                    gl.glTexCoord2d(0, 0);
                     gl.glVertex3d(x + 1, y + 1, this.getAltitude(x + 1, y + 1));
+                    gl.glTexCoord2d(1, 0);
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
+                    gl.glTexCoord2d(0.5, 1);
                     gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                 }
                 gl.glEnd();
             }
         }
+    }
+    
+    public void init(GLAutoDrawable drawable)
+    {
+        GL2 gl = drawable.getGL().getGL2();
+        
+        textures = new Texture[1];
+        textures[0] = new Texture(gl, textureFileName1, textureExt1, true);
     }
 
     

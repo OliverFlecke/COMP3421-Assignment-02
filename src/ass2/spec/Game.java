@@ -84,8 +84,11 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         gl.glEnable(GL2.GL_LIGHT0);
         gl.glEnable(GL2.GL_NORMALIZE);
 
-        float[] pos = { 5, 5, 5, 1 };
+        float[] pos = { 0, 0, 10, 1 };
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, pos, 0);
+        
+//        float[] pos1 = { 0, 0, 10, 1 };
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, pos1, 0);
         
         float[] amb = {0.1f, 0.2f, 0.3f, 1.0f};
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, amb, 0);
@@ -126,7 +129,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		// TODO Auto-generated method stub
+	    GL2 gl = drawable.getGL().getGL2();
+	    gl.glEnable(GL2.GL_TEXTURE_2D);
+	    this.terrain.init(drawable);
 	}
 
 	@Override
