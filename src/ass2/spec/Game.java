@@ -65,6 +65,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         game.run();
     }
 
+    boolean direction = true;
+    float[] pos = { 0, 0, 10, 1 };
+    
 	@Override
 	public void display(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
@@ -84,7 +87,20 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         gl.glEnable(GL2.GL_LIGHT0);
         gl.glEnable(GL2.GL_NORMALIZE);
 
-        float[] pos = { 0, 0, 10, 1 };
+        float rate = 0.05f;
+        if (direction)
+        {
+            pos[0] += rate;
+            pos[1] += rate;
+            if (pos[0] >= 10) direction = false;
+        }
+        else 
+        {
+            pos[0] -= rate;
+            pos[1] -= rate;
+            if (pos[0] <= 0) direction = true;
+        }
+
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, pos, 0);
         
 //        float[] pos1 = { 0, 0, 10, 1 };

@@ -174,12 +174,12 @@ public class Terrain {
                 double[] v2 = MathHelper.getVector(x, y, this.getAltitude(x, y), x, y + 1, this.getAltitude(x, y + 1));
                 double[] normal = MathHelper.crossProduct(v1, v2);
 //                System.out.println("First normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
-                gl.glBegin(GL2.GL_LINES);
-                {
-                    gl.glVertex3d(x, y, this.getAltitude(x, y));
-                    gl.glVertex3d(x + normal[0], y + normal[1], this.getAltitude(x, y) + normal[2]);
-                }
-                gl.glEnd();
+//                gl.glBegin(GL2.GL_LINES);
+//                {
+//                    gl.glVertex3d(x, y, this.getAltitude(x, y));
+//                    gl.glVertex3d(x + normal[0], y + normal[1], this.getAltitude(x, y) + normal[2]);
+//                }
+//                gl.glEnd();
                 
                 
                 gl.glBegin(GL2.GL_TRIANGLES);
@@ -197,12 +197,12 @@ public class Terrain {
                 v1 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x + 1, y, this.getAltitude(x + 1, y));
                 v2 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x, y + 1, this.getAltitude(x, y + 1));
                 normal = MathHelper.crossProduct(v2, v1);
-                gl.glBegin(GL2.GL_LINES);
-                {
-                    gl.glVertex3d(x + 1, y + 1, this.getAltitude(x, y));
-                    gl.glVertex3d(x + 1 + normal[0], y + 1 + normal[1], this.getAltitude(x, y + 1) + normal[2]);
-                }
-                gl.glEnd();
+//                gl.glBegin(GL2.GL_LINES);
+//                {
+//                    gl.glVertex3d(x + 1, y + 1, this.getAltitude(x, y));
+//                    gl.glVertex3d(x + 1 + normal[0], y + 1 + normal[1], this.getAltitude(x, y + 1) + normal[2]);
+//                }
+//                gl.glEnd();
                 
 //                System.out.println("second normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
                 gl.glBegin(GL2.GL_TRIANGLES);
