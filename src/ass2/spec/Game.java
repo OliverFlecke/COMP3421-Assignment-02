@@ -91,20 +91,29 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, amb, 0);
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
+        
+//      float[] a = new float[4];
+//      a[0] = a[1] = a[2] = 0.2f;
+//      a[3] = 1.0f;
+//      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, a, 0);
+//
+//      float[] d = new float[4];
+//      d[0] = d[1] = d[2] = 0.5f;
+//      d[3] = 1.0f;
+//      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, d, 0);
+//
+//      float[] s = new float[4];
+//      s[0] = s[1] = s[2] = 0.2f;
+//      s[3] = 1.0f;
+//	    gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, s, 0);
 	    
-//	    setCamera(gl, new GLU(), 15);
-//	    gl.glFrustum(-1, 11, -1, 11, 1, 5);
-//	    gl.glRotated(30, 0, 1, 0);
-//	    gl.glOrtho(0, this.terrain.size().getWidth(), 0, this.terrain.size().getHeight(), 1, 10);
-//	    gl.glOrtho(0, 12, 0, 12, 0, -2);
 	    GLU glu = new GLU();
 	    glu.gluPerspective(60, 1, 1, 100);
-	    glu.gluLookAt(5 + dx, dy, 5 + dz, 5, 5, 0, 0, 1, 0);
+	    glu.gluLookAt(5 + cx, cy, 5 + cz, 5 + x, 5 + y, 0 + z, 0, 1, 0);
 //	    gl.glRotated(90, 1, 0, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
-//	    gl.glTranslated(dx, dy, dz);
 
         this.terrain.display(gl);
 	}
@@ -126,42 +135,61 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 		
 	}
 	
-	int dx = 0;
-	int dy = 0;
-	int dz = 0;
+	int x = 0, y = 0, z = 0;
+	int cx = 0;
+	int cy = 0;
+	int cz = 0;
     @Override
     public void keyPressed(KeyEvent e) {
          switch (e.getKeyCode())
          {
              // Reset variables
              case KeyEvent.VK_R:
-                 dx = 0;
-                 dy = 0;
-                 dz = 0;
+                 cx = cy = cz = 0;
+                 x = y = z = 0;
                  break;
-             
-             case KeyEvent.VK_RIGHT:
-                 dx += 1;
+             case KeyEvent.VK_E:
+                 cx += 1;
+                 x += 1;
                  break;
+             case KeyEvent.VK_A:
+                 cx -= 1;
+                 x -= 1;
+                 break;
+             case KeyEvent.VK_COMMA:
+                 cy += 1;
+                 y += 1;
+                 break;
+             case KeyEvent.VK_O:
+                 cy -= 1;
+                 y -= 1;
+                 break;
+
+             // Arrow keys to move camera around
              case KeyEvent.VK_LEFT:
-                 dx -= 1;
+                 cx -= 1;
+                 break;
+             case KeyEvent.VK_RIGHT:
+                 cx += 1;
                  break;
              case KeyEvent.VK_UP:
-                 dy += 1;
+                 cy += 1;
                  break;
              case KeyEvent.VK_DOWN:
-                 dy -= 1;
+                 cy -= 1;
                  break;
              case KeyEvent.VK_0:
-                 dz += 1;
+                 cz += 1;
+//                 z += 1;
                  break;
              case KeyEvent.VK_9:
-                 dz -= 1;
+                 cz -= 1;
+//                 z -= 1;
                  break;
              default:
                  break;
          }
-         System.out.println("dx: " + dx + " \tdy: " + dy + " \tdz: " + dz);
+         System.out.println("dx: " + cx + " \tdy: " + cy + " \tdz: " + cz);
     }
     
     @Override

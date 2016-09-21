@@ -157,46 +157,50 @@ public class Terrain {
      * @param gl
      */
     public void display(GL2 gl) {
-        
-//        float[] a = new float[4];
-//        a[0] = a[1] = a[2] = 0.2f;
-//        a[3] = 1.0f;
-//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, a, 0);
-//
-//        float[] d = new float[4];
-//        d[0] = d[1] = d[2] = 0.5f;
-//        d[3] = 1.0f;
-//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, d, 0);
-//
-//        float[] s = new float[4];
-//        s[0] = s[1] = s[2] = 0.2f;
-//        s[3] = 1.0f;
-//        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, s, 0);
-
-        gl.glBegin(GL.GL_TRIANGLES);
-        {
-            for (int x = 0; x < size.getHeight() - 1; x++) {
-                for (int y = 0; y < size.getWidth() - 1; y++) {
-                    double[] v1 = MathHelper.getVector(x, y, this.getAltitude(x, y), x + 1, y, this.getAltitude(x + 1, y));
-                    double[] v2 = MathHelper.getVector(x, y, this.getAltitude(x, y), x, y + 1, this.getAltitude(x, y + 1));
-                    double[] normal = MathHelper.crossProduct(v1, v2);
+        for (int x = 0; x < size.getHeight() - 1; x++) {
+            for (int y = 0; y < size.getWidth() - 1; y++) {
+                double[] v1 = MathHelper.getVector(x, y, this.getAltitude(x, y), x + 1, y, this.getAltitude(x + 1, y));
+                double[] v2 = MathHelper.getVector(x, y, this.getAltitude(x, y), x, y + 1, this.getAltitude(x, y + 1));
+                double[] normal = MathHelper.crossProduct(v1, v2);
+//                System.out.println("First normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
+                gl.glBegin(GL2.GL_LINES);
+                {
+                    gl.glVertex3d(x, y, this.getAltitude(x, y));
+                    gl.glVertex3d(x + normal[0], y + normal[1], this.getAltitude(x, y) + normal[2]);
+                }
+                gl.glEnd();
+                
+                
+                gl.glBegin(GL2.GL_TRIANGLES);
+                {
                     gl.glNormal3d(normal[0], normal[1], normal[2]);
                     gl.glVertex3d(x, y, this.getAltitude(x, y));
                     gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
-                    
-                    v1 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x + 1, y, this.getAltitude(x + 1, y));
-                    v2 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x, y + 1, this.getAltitude(x, y + 1));
-                    normal = MathHelper.crossProduct(v1, v2);
+                }
+                gl.glEnd();
+                
+                v1 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x + 1, y, this.getAltitude(x + 1, y));
+                v2 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x, y + 1, this.getAltitude(x, y + 1));
+                normal = MathHelper.crossProduct(v2, v1);
+                gl.glBegin(GL2.GL_LINES);
+                {
+                    gl.glVertex3d(x + 1, y + 1, this.getAltitude(x, y));
+                    gl.glVertex3d(x + 1 + normal[0], y + 1 + normal[1], this.getAltitude(x, y + 1) + normal[2]);
+                }
+                gl.glEnd();
+                
+//                System.out.println("second normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
+                gl.glBegin(GL2.GL_TRIANGLES);
+                {
                     gl.glNormal3d(normal[0], normal[1], normal[2]);
                     gl.glVertex3d(x + 1, y + 1, this.getAltitude(x + 1, y + 1));
-                    gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                     gl.glVertex3d(x, y + 1, this.getAltitude(x, y + 1));
-                
+                    gl.glVertex3d(x + 1, y, this.getAltitude(x + 1, y));
                 }
+                gl.glEnd();
             }
         }
-        gl.glEnd();
     }
 
     
