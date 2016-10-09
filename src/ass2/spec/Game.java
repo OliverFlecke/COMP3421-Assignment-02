@@ -21,6 +21,10 @@ import com.jogamp.opengl.util.gl2.GLUT;
  */
 public class Game extends JFrame implements GLEventListener, KeyListener {
 
+    boolean dynamicLightning = true;
+    boolean direction = true;
+    float[] pos = { 0, 0, 10, 1 };
+    
     private Terrain terrain;
 
     public Game(Terrain terrain) {
@@ -65,10 +69,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         game.run();
     }
 
-    boolean dynamicLightning = false;
-    boolean direction = true;
-    float[] pos = { 0, 0, 10, 1 };
-    
 	@Override
 	public void display(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
