@@ -160,10 +160,12 @@ public class Terrain {
 
     /**
      * Draw the terrain in the world
-     * @param gl
+     * @param drawable
      */
-    public void display(GL2 gl) 
+    public void display(GLAutoDrawable drawable) 
     {
+        GL2 gl = drawable.getGL().getGL2();
+        
         // Load the texture
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[0].getTextureId());
         
@@ -218,6 +220,11 @@ public class Terrain {
                 gl.glEnd();
             }
         }
+        
+        for (Tree tree : this.trees) 
+        {
+            tree.display(drawable);
+        }
     }
     
     public void init(GLAutoDrawable drawable)
@@ -226,6 +233,12 @@ public class Terrain {
         
         textures = new Texture[1];
         textures[0] = new Texture(gl, textureFileName1, textureExt1, true);
+        
+        for (Tree tree : trees) 
+        {
+            tree.setTerrain(this);
+            tree.init(drawable);
+        }
     }
 
     

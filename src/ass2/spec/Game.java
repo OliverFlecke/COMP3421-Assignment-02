@@ -65,40 +65,35 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         game.run();
     }
 
+    boolean dynamicLightning = false;
     boolean direction = true;
     float[] pos = { 0, 0, 10, 1 };
     
 	@Override
 	public void display(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
-	    
-	    // Makes sure that the objects are drawn in the right order
-	    gl.glEnable(GL2.GL_DEPTH_TEST);
 	    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
 	    // Disabled by default
 	    // To turn on culling:
-	    gl.glEnable(GL2.GL_CULL_FACE);
-	    gl.glCullFace(GL2.GL_BACK);
+//	    gl.glEnable(GL2.GL_CULL_FACE);
+//	    gl.glCullFace(GL2.GL_BACK);
 	    
-        
-        // enable lighting
-        gl.glEnable(GL2.GL_LIGHTING);
-        gl.glEnable(GL2.GL_LIGHT0);
-        gl.glEnable(GL2.GL_NORMALIZE);
-
-        float rate = 0.05f;
-        if (direction)
+        if (dynamicLightning)
         {
-            pos[0] += rate;
-            pos[1] += rate;
-            if (pos[0] >= 10) direction = false;
-        }
-        else 
-        {
-            pos[0] -= rate;
-            pos[1] -= rate;
-            if (pos[0] <= 0) direction = true;
+            float rate = 0.05f;
+            if (direction)
+            {
+                pos[0] += rate;
+                pos[1] += rate;
+                if (pos[0] >= 10) direction = false;
+            }
+            else 
+            {
+                pos[0] -= rate;
+                pos[1] -= rate;
+                if (pos[0] <= 0) direction = true;
+            }
         }
 
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, pos, 0);
@@ -133,8 +128,25 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
+	    
+        // Draw axis'
+        gl.glBegin(GL2.GL_LINES);
+        {
+            gl.glColor3d(1, 0, 0);
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(1, 0, 0);
+            
+            gl.glColor3d(0, 1, 0);
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(0, 1, 0);
+            
+            gl.glColor3d(0, 0, 1);
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(0, 0, 1);
+        }
+        gl.glEnd();
 
-        this.terrain.display(gl);
+        this.terrain.display(drawable);
 	}
 
 	@Override
@@ -146,6 +158,13 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
+	    // Makes sure that the objects are drawn in the right order
+        gl.glEnable(GL2.GL_DEPTH_TEST);
+        // enable lighting
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHT0);
+        gl.glEnable(GL2.GL_NORMALIZE);
+	    
 	    gl.glEnable(GL2.GL_TEXTURE_2D);
 	    this.terrain.init(drawable);
 	}
