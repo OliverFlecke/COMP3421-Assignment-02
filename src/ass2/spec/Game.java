@@ -23,7 +23,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 
     boolean dynamicLightning = true;
     boolean direction = true;
-    float[] pos = { 0, 0, 10, 1 };
+    float[] lightPos = { 0, -5, 5, 1 };
     
     private Terrain terrain;
 
@@ -76,55 +76,16 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 
 	    // Disabled by default
 	    // To turn on culling:
-//	    gl.glEnable(GL2.GL_CULL_FACE);
-//	    gl.glCullFace(GL2.GL_BACK);
+	    gl.glEnable(GL2.GL_CULL_FACE);
+	    gl.glCullFace(GL2.GL_BACK);
 	    
-        if (dynamicLightning)
-        {
-            float rate = 0.05f;
-            if (direction)
-            {
-                pos[0] += rate;
-                pos[1] += rate;
-                if (pos[0] >= 10) direction = false;
-            }
-            else 
-            {
-                pos[0] -= rate;
-                pos[1] -= rate;
-                if (pos[0] <= 0) direction = true;
-            }
-        }
+        setUpLighting(gl);
 
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, pos, 0);
-        
-//        float[] pos1 = { 0, 0, 10, 1 };
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, pos1, 0);
-        
-        float[] amb = {0.1f, 0.2f, 0.3f, 1.0f};
-        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, amb, 0);
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
-        
-//      float[] a = new float[4];
-//      a[0] = a[1] = a[2] = 0.2f;
-//      a[3] = 1.0f;
-//      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, a, 0);
-//
-//      float[] d = new float[4];
-//      d[0] = d[1] = d[2] = 0.5f;
-//      d[3] = 1.0f;
-//      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, d, 0);
-//
-//      float[] s = new float[4];
-//      s[0] = s[1] = s[2] = 0.2f;
-//      s[3] = 1.0f;
-//	    gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, s, 0);
-	    
 	    GLU glu = new GLU();
 	    glu.gluPerspective(60, 1, 1, 100);
 	    glu.gluLookAt(5 + cx, cy, 5 + cz, 5 + x, 5 + y, 0 + z, 0, 1, 0);
-//	    gl.glRotated(90, 1, 0, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
@@ -158,6 +119,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
+	    gl.glClearColor(0.2f, 0.2f, 1f, 1f);
 	    // Makes sure that the objects are drawn in the right order
         gl.glEnable(GL2.GL_DEPTH_TEST);
         // enable lighting
@@ -168,6 +130,44 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	    gl.glEnable(GL2.GL_TEXTURE_2D);
 	    this.terrain.init(drawable);
 	}
+	
+    public void setUpLighting(GL2 gl) 
+    {
+        // Light property vectors.
+//        float lightPos[] = { -3f, -5f, 5f, 1f };
+        float lightAmb[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        float lightDifAndSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        float globAmb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+        
+        if (dynamicLightning)
+        {
+            float rate = 0.05f;
+            if (direction)
+            {
+                lightPos[0] += rate;
+                lightPos[1] += rate;
+                if (lightPos[0] >= 10) direction = false;
+            }
+            else 
+            {
+                lightPos[0] -= rate;
+                lightPos[1] -= rate;
+                if (lightPos[0] <= -5) direction = true;
+            }
+        }
+        
+        gl.glEnable(GL2.GL_LIGHT0); // Enable particular light source.
+        
+        // Set light properties.
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPos,0);
+        
+            
+        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
+        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
+    }
 
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
