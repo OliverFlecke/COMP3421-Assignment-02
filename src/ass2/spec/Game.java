@@ -23,7 +23,10 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 
     boolean dynamicLightning = true;
     boolean direction = true;
-    float[] lightPos = { 0, -5, 5, 1 };
+    float[] lightPos = { 0, 0, 5, 1 };
+    int light_slices = 250;
+    int light_step = 0;
+    float light_radius = 10f;
     
     private Terrain terrain;
 
@@ -51,7 +54,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         animator.start();
         
         this.getContentPane().add(panel);
-        this.setSize(800, 600);
+        this.setSize(1800, 1600);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -69,6 +72,8 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         game.run();
     }
 
+    private double rotate_angle = 0;
+    
 	@Override
 	public void display(GLAutoDrawable drawable) {
 	    GL2 gl = drawable.getGL().getGL2();
@@ -80,15 +85,18 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
 	    gl.glCullFace(GL2.GL_BACK);
 	    
         setUpLighting(gl);
-
+        
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    GLU glu = new GLU();
 	    glu.gluPerspective(60, 1, 1, 100);
-	    glu.gluLookAt(5 + cx, cy, 5 + cz, 5 + x, 5 + y, 0 + z, 0, 1, 0);
+	    glu.gluLookAt(cx, -10 + cy, 5 + cz, x, y, 0 + z, 0, 1, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
+	    gl.glRotated(rotate_angle, 0, 0, 1);
+        gl.glTranslated(-this.terrain.size().getWidth() / 2, 
+                -this.terrain.size().getHeight() / 2, 0);
 	    
         // Draw axis'
         gl.glBegin(GL2.GL_LINES);
@@ -141,30 +149,22 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
         
         if (dynamicLightning)
         {
-            float rate = 0.05f;
-            if (direction)
-            {
-                lightPos[0] += rate;
-                lightPos[1] += rate;
-                if (lightPos[0] >= 10) direction = false;
-            }
-            else 
-            {
-                lightPos[0] -= rate;
-                lightPos[1] -= rate;
-                if (lightPos[0] <= -5) direction = true;
-            }
+            double light_angle = light_step * (2 * Math.PI / light_slices);
+            
+            lightPos[0] = (float) ((this.terrain.size().getWidth() / 2) 
+                    + light_radius * Math.cos(light_angle));
+            lightPos[1] = (float) ((this.terrain.size().getHeight() / 2) 
+                    + light_radius * Math.sin(light_angle));
+            light_step++;
         }
         
-        gl.glEnable(GL2.GL_LIGHT0); // Enable particular light source.
-        
+        gl.glEnable(GL2.GL_LIGHT0);
         // Set light properties.
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPos,0);
         
-            
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
         gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
     }
@@ -188,34 +188,34 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
                  cx = cy = cz = 0;
                  x = y = z = 0;
                  break;
-             case KeyEvent.VK_E:
+             case KeyEvent.VK_RIGHT:
                  cx += 1;
                  x += 1;
                  break;
-             case KeyEvent.VK_A:
+             case KeyEvent.VK_LEFT:
                  cx -= 1;
                  x -= 1;
                  break;
-             case KeyEvent.VK_COMMA:
+             case KeyEvent.VK_UP:
                  cy += 1;
                  y += 1;
                  break;
-             case KeyEvent.VK_O:
+             case KeyEvent.VK_DOWN:
                  cy -= 1;
                  y -= 1;
                  break;
 
              // Arrow keys to move camera around
-             case KeyEvent.VK_LEFT:
+             case KeyEvent.VK_A:
                  cx -= 1;
                  break;
-             case KeyEvent.VK_RIGHT:
+             case KeyEvent.VK_E:
                  cx += 1;
                  break;
-             case KeyEvent.VK_UP:
+             case KeyEvent.VK_COMMA:
                  cy += 1;
                  break;
-             case KeyEvent.VK_DOWN:
+             case KeyEvent.VK_O:
                  cy -= 1;
                  break;
              case KeyEvent.VK_0:
@@ -225,6 +225,17 @@ public class Game extends JFrame implements GLEventListener, KeyListener {
              case KeyEvent.VK_9:
                  cz -= 1;
 //                 z -= 1;
+                 break;
+                 
+             case KeyEvent.VK_1:
+                 rotate_angle += 10;
+                 break;
+             case KeyEvent.VK_2:
+                 rotate_angle -= 10;
+                 break;
+                 
+             case KeyEvent.VK_L:
+                 dynamicLightning = !dynamicLightning;
                  break;
              default:
                  break;
