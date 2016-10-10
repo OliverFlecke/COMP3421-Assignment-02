@@ -3,6 +3,7 @@ package ass2.spec;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 /**
  * COMMENT: Comment Tree 
@@ -41,56 +42,58 @@ public class Tree {
     {
         GL2 gl = drawable.getGL().getGL2();
         
-        gl.glColor3f(1, 1, 1);
         double x = this.getPosition()[0];
         double y = this.getPosition()[2];
         double z = this.getPosition()[1];
-        
         double z_bottom = this.getTerrain().getAltitude(x, y);
         double z_top = this.getTerrain().getAltitude(x, y) + z;
-        
+
         // Draw a line to see were the center of the tree should be
         gl.glBegin(GL2.GL_LINES);
         {
+            gl.glColor3f(1, 1, 1);
             gl.glVertex3d(x, y, z_bottom);
             gl.glVertex3d(x, y, z_top);
         }
         gl.glEnd();
         
+        // Push a matrix so you don't have to calculate the position
+        gl.glPushMatrix();
+        gl.glTranslated(x, y, z_bottom);
         
         gl.glPolygonMode(GL2.GL_BACK, GL2.GL_LINE);
-        //Front circle
-        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        {
-             gl.glNormal3d(0, 0, -1);
-             gl.glVertex3d(x, y, z_bottom);
-             double angleStep = 2*Math.PI / slices;
-             for (int i = 0; i <= slices ; i++) {
-                 double angle = i * angleStep;
-                 double x_current = Math.cos(angle);
-                 double y_current = Math.sin(angle);
-
-                gl.glVertex3d(x + radius * x_current, y + radius * y_current, z_bottom);
-             }
-        }
-        gl.glEnd();
+//        //Front circle
+//        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+//        {
+//             gl.glNormal3d(0, 0, -1);
+//             gl.glVertex3d(0, 0, z_bottom);
+//             double angleStep = 2*Math.PI / slices;
+//             for (int i = 0; i <= slices ; i++) {
+//                 double angle = i * angleStep;
+//                 double x_current = Math.cos(angle);
+//                 double y_current = Math.sin(angle);
+//
+//                gl.glVertex3d(radius * x_current, radius * y_current, 0);
+//             }
+//        }
+//        gl.glEnd();
         
-        // Back of the circle
-        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        {
-            gl.glNormal3d(0, 0, -1);
-            gl.glVertex3d(x, y, z_top);
-            double angleStep = 2*Math.PI / slices;
-            for (int i = slices; i >= 0; i--)
-            {
-                double angle = 2*Math.PI - i * angleStep;
-                double x_current = Math.cos(angle);
-                double y_current = Math.sin(angle);
-                
-                gl.glVertex3d(x + radius * x_current, y + radius * y_current, z_top);
-            }
-        }
-        gl.glEnd();
+//        // Back of the circle
+//        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+//        {
+//            gl.glNormal3d(0, 0, -1);
+//            gl.glVertex3d(0, 0, z_top);
+//            double angleStep = 2*Math.PI / slices;
+//            for (int i = slices; i >= 0; i--)
+//            {
+//                double angle = 2*Math.PI - i * angleStep;
+//                double x_current = Math.cos(angle);
+//                double y_current = Math.sin(angle);
+//                
+//                gl.glVertex3d(radius * x_current, radius * y_current, z);
+//            }
+//        }
+//        gl.glEnd();
         
         // Side of the cylinder
         // Load the texture
@@ -107,13 +110,21 @@ public class Tree {
                 
                 gl.glNormal3d(x_current, y_current, 0);
                 gl.glTexCoord2d(tex_coord, 1);
-                gl.glVertex3d(x + radius * x_current, y + radius * y_current, z_top);
+                gl.glVertex3d(radius * x_current, radius * y_current, z);
                 gl.glTexCoord2d(tex_coord, 0);
-                gl.glVertex3d(x + radius * x_current, y + radius * y_current, z_bottom);
+                gl.glVertex3d(radius * x_current, radius * y_current, 0);
             }
         }
         gl.glEnd();
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
+        
+        gl.glPushMatrix();
+            gl.glTranslated(0, 0, z + 0.9);
+            GLUT glut = new GLUT();
+            glut.glutSolidSphere(1, 40, 40);
+        gl.glPopMatrix();
+        
+        gl.glPopMatrix();
     }
     
     public void init(GLAutoDrawable drawable) 
