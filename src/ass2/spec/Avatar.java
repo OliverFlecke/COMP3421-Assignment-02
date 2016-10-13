@@ -67,9 +67,9 @@ public class Avatar
      */
     public void lookUp()
     {
-        if (rotation[1] < 80)
+        if (rotation[1] > -80)
         {
-            rotation[1] += angle_step;
+            rotation[1] -= angle_step;
         }
     }
     
@@ -78,20 +78,34 @@ public class Avatar
      */
     public void lookDown()
     {
-        if (rotation[1] > -80)
+        if (rotation[1] < 80)
         {
-            rotation[1] -= angle_step;
+            rotation[1] += angle_step;
         }
     }
     
+    /**
+     * Make the avatar look to the right
+     */
     public void lookRight()
     {
         rotation[0] += angle_step;
+        if (rotation[0] >= 360)
+        {
+            rotation[0] = 0;
+        }
     }
     
+    /**
+     * Make the avatar look to the left
+     */
     public void lookLeft()
     {
         rotation[0] -= angle_step;
+        if (rotation[0] <= 0)
+        {
+            rotation[0] = 359;
+        }
     }
     
     /**
@@ -99,8 +113,8 @@ public class Avatar
      */
     public void reset()
     {
-        position = new double[3];
-        rotation = new double[3];
+        position = new double[] { 0, 5, 0 };
+        rotation = new double[] { 0, 0, 0 };
         look = new double[] { 0, -10, 5 };
     }
     
