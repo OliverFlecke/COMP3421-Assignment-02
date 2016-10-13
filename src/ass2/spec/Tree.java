@@ -1,5 +1,7 @@
 package ass2.spec;
 
+import java.util.Random;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
@@ -10,13 +12,15 @@ import com.jogamp.opengl.util.gl2.GLUT;
  *
  * @author malcolmr
  */
-public class Tree {
-
+public class Tree 
+{
+    private static Random random = new Random();
+    
     private String textureFileName = "src/textures/tree.jpg";
     private String textureExt = "jpg";
     private Texture texture;
     
-    
+    private double height = 1;
     private double[] myPos;
     private double radius = 0.25;
     private Terrain terrain;
@@ -26,8 +30,12 @@ public class Tree {
     public Tree(double x, double y, double z) {
         myPos = new double[3];
         myPos[0] = x;
-        myPos[1] = y;
-        myPos[2] = z;
+        myPos[1] = z;
+        myPos[2] = height + random.nextDouble() * 2;
+//        System.out.println("Tree: ");
+//        System.out.println(myPos[0]);
+//        System.out.println(myPos[1]);
+//        System.out.println(myPos[2]);
     }
     
     public double[] getPosition() {
@@ -43,8 +51,8 @@ public class Tree {
         GL2 gl = drawable.getGL().getGL2();
         
         double x = this.getPosition()[0];
-        double y = this.getPosition()[2];
-        double z = this.getPosition()[1];
+        double y = this.getPosition()[1];
+        double z = this.getPosition()[2];
         double z_bottom = this.getTerrain().getAltitude(x, y);
         double z_top = this.getTerrain().getAltitude(x, y) + z;
 
