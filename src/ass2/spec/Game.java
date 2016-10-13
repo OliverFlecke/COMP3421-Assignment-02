@@ -31,11 +31,11 @@ public class Game extends JFrame implements GLEventListener, KeyListener
     private Terrain terrain;
     
     // Angle to rotate the world
-    private double rotate_angle = 0;
+    private double[] rotate_angle;;
     
     // Camera variables
-    private int[] camera_position = new int[3];
-    private int[] camera_look = new int[3];
+    private double[] camera_position;
+    private double[] camera_look;
     
     /**
      * Create a game with a terrain
@@ -97,14 +97,27 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	    gl.glLoadIdentity();
 	    GLU glu = new GLU();
 	    glu.gluPerspective(60, 1, 1, 100);
-	    glu.gluLookAt(camera_look[0], -10 + camera_look[1], 5 + camera_look[2], 
-	            camera_position[0], camera_position[1], 0 + camera_position[2], 
+	    glu.gluLookAt(camera_position[0] + camera_look[0], 
+	            camera_position[1] + camera_look[1], 
+	            camera_position[2] + camera_look[2], 
+	            camera_position[0], camera_position[1], camera_position[2], 
 	            0, 1, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
-	    gl.glRotated(rotate_angle, 0, 0, 1);
-        gl.glTranslated(-this.terrain.size().getWidth() / 2, 
+	    gl.glTranslated(camera_position[0] + camera_look[0], 
+	            camera_position[1] + camera_look[1], 
+	            camera_position[2] + camera_look[2]);
+	    gl.glRotated(rotate_angle[0], 0, 0, 1);
+	    gl.glRotated(-rotate_angle[1], 
+	            Math.cos(rotate_angle[0] / 180 * Math.PI), 
+	            Math.sin(rotate_angle[0] / 180 * Math.PI), 0);	    
+	    gl.glTranslated(-(camera_position[0] + camera_look[0]), 
+	            -(camera_position[1] + camera_look[1]), 
+	            -(camera_position[2] + camera_look[2]));
+        
+	    // Center the world to 0,0
+	    gl.glTranslated(-this.terrain.size().getWidth() / 2, 
                 -this.terrain.size().getHeight() / 2, 0);
 	    
         // Draw axis'
@@ -133,6 +146,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	@Override
 	public void init(GLAutoDrawable drawable)
 	{
+	    resetCamera();
 	    GL2 gl = drawable.getGL().getGL2();
 	    gl.glClearColor(0.2f, 0.2f, 1f, 1f);
 	    // Makes sure that the objects are drawn in the right order
@@ -178,72 +192,117 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
+
+	double step_size = 0.1;
 	
+    public void moveRight()
+    {
+        camera_position[0] += step_size * Math.cos(rotate_angle[0] / 180 * Math.PI);
+        camera_position[1] += step_size * (-Math.sin(rotate_angle[0] / 180 * Math.PI));
+        System.out.println("Move right");
+    }
+    
+    public void moveLeft()
+    {
+        camera_position[0] -= step_size * Math.cos(rotate_angle[0] / 180 * Math.PI);
+        camera_position[1] -= step_size * (-Math.sin(rotate_angle[0] / 180 * Math.PI));
+        System.out.println("Move left");
+    }
+    
+    public void moveForward()
+    {
+        camera_position[1] += step_size * Math.cos(rotate_angle[0] / 180 * Math.PI);
+        camera_position[0] += step_size * Math.sin(rotate_angle[0] / 180 * Math.PI);
+        System.out.println("Move up");
+    }
+    
+    public void moveBackward()
+    {
+        
+        camera_position[1] -= step_size * Math.cos(rotate_angle[0] / 180 * Math.PI);
+        camera_position[0] -= step_size * Math.sin(rotate_angle[0] / 180 * Math.PI);
+        System.out.println("Move down");
+    }
+    
+    /**
+     * Reset the camera to the original position
+     */
+    public void resetCamera()
+    {
+        camera_position = new double[3];
+        camera_look = new double[] { 0, -10, 5 };
+        rotate_angle = new double[3];
+    }
+    
+    double angle_step = 1;
     @Override
     public void keyPressed(KeyEvent e) 
     {
-         switch (e.getKeyCode())
-         {
-             // Reset variables
-             case KeyEvent.VK_R:
-                 camera_look = new int[3];
-                 camera_position = new int[3];
-                 break;
-             
-             // Move the camera around with the arrow keys
-             case KeyEvent.VK_RIGHT:
-                 camera_look[0] += 1;
-                 camera_position[0] += 1;
-                 break;
-             case KeyEvent.VK_LEFT:
-                 camera_look[0] -= 1;
-                 camera_position[0] -= 1;
-                 break;
-             case KeyEvent.VK_UP:
-                 camera_look[1] += 1;
-                 camera_position[1] += 1;
-                 break;
-             case KeyEvent.VK_DOWN:
-                 camera_look[1] -= 1;
-                 camera_position[1] -= 1;
-                 break;
+        switch (e.getKeyCode())
+        {
+            // Reset variables
+            case KeyEvent.VK_R:
+                resetCamera();
+                break;
+            
+            // Move the camera around with the arrow keys
+            case KeyEvent.VK_RIGHT:
+                moveRight();
+                break;
+            case KeyEvent.VK_LEFT:
+                moveLeft();
+                break;
+            case KeyEvent.VK_UP:
+                moveForward();
+                break;
+            case KeyEvent.VK_DOWN:
+                moveBackward();
+                break;
 
-             // Use <AOE to move the point which the camera is looking at
-             case KeyEvent.VK_A:
-                 camera_look[0] -= 1;
-                 break;
-             case KeyEvent.VK_E:
-                 camera_look[0] += 1;
-                 break;
-             case KeyEvent.VK_COMMA:
-                 camera_look[1] += 1;
-                 break;
-             case KeyEvent.VK_O:
-                 camera_look[1] -= 1;
-                 break;
-             case KeyEvent.VK_0:
-                 camera_look[2] += 1;
-                 break;
-             case KeyEvent.VK_9:
-                 camera_look[2] -= 1;
-                 break;
-                 
-             // Rotate the world
-             case KeyEvent.VK_1:
-                 rotate_angle += 10;
-                 break;
-             case KeyEvent.VK_2:
-                 rotate_angle -= 10;
-                 break;
-                 
-             // Switch dynamic lightning on/off
-             case KeyEvent.VK_L:
-                 dynamic_lightning = !dynamic_lightning;
-                 break;
-             default:
-                 break;
-         }
-         System.out.println("dx: " + camera_look[0] + " \tdy: " + camera_look[1] + " \tdz: " + camera_look[2]);
+            // Rotate the world
+            case KeyEvent.VK_E:
+                rotate_angle[0] += angle_step;
+                System.out.println(rotate_angle[0]);
+                break;
+            case KeyEvent.VK_A:
+                rotate_angle[0] -= angle_step;
+                break;
+            case KeyEvent.VK_COMMA:
+                rotate_angle[1] += angle_step;
+                break;
+            case KeyEvent.VK_O:
+                rotate_angle[1] -= angle_step;
+                break;
+                
+                // Switch dynamic lightning on/off
+            case KeyEvent.VK_L:
+                dynamic_lightning = !dynamic_lightning;
+                break;
+        
+//            // Use <AOE to move the point which the camera is looking at
+//            case KeyEvent.VK_A:
+//                camera_look[0] -= 1;
+//                break;
+//            case KeyEvent.VK_E:
+//                camera_look[0] += 1;
+//                break;
+//            case KeyEvent.VK_COMMA:
+//                camera_look[1] += 1;
+//                break;
+//            case KeyEvent.VK_O:
+//                camera_look[1] -= 1;
+//                break;
+//            case KeyEvent.VK_0:
+//                camera_look[2] += 1;
+//                break;
+//            case KeyEvent.VK_9:
+//                camera_look[2] -= 1;
+//                break;
+             
+            default:
+                break;
+        }
+//        System.out.println("dx: " + camera_look[0] + " \tdy: " + camera_look[1] + " \tdz: " + camera_look[2]);
     }
     
     @Override
