@@ -58,7 +58,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         animator.start();
         
         this.getContentPane().add(panel);
-        this.setSize(1800, 1600);
+        this.setSize(1400, 1200);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -73,6 +73,28 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         Terrain terrain = LevelIO.load(new File(args[0]));
         Game game = new Game(terrain);
         game.run();
+//        for (int angle = 0; angle < 360; angle++)
+//        {
+//            System.out.println(angle + "," + game.rotation_ration(angle));
+//        }
+    }
+    
+    /**
+     * Needs better name and explenation for what it actually calculates
+     * @param angle which the rotation should consider
+     * @return 
+     */
+    public double rotation_ration(double angle)
+    {
+        double output = (90.0 - angle % 90.0) / 90.0;
+        if ((angle >= 90 && angle < 180) || (angle >= 270 && angle < 360))
+        {
+            return 1 - output;
+        }
+        else 
+        {
+            return output;
+        }
     }
     
 	@Override
@@ -85,7 +107,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	    gl.glEnable(GL2.GL_CULL_FACE);
 	    gl.glCullFace(GL2.GL_BACK);
 	    
-        setUpLighting(gl);
         
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
@@ -99,13 +120,18 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
+	    
+	    // Rotate the world around the player
 	    gl.glTranslated(avatar.getPosition()[0] + avatar.getLook()[0], 
 	            avatar.getPosition()[1] + avatar.getLook()[1], 
 	            avatar.getPosition()[2] + avatar.getLook()[2]);
+	    
 	    gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
-	    gl.glRotated(-avatar.getRotation()[1], 
-	            Math.cos(avatar.getRotation()[0] / 180 * Math.PI), 
-	            Math.sin(avatar.getRotation()[0] / 180 * Math.PI), 0);	    
+	    gl.glRotated(avatar.getRotation()[1],
+	            rotation_ration(avatar.getRotation()[0]),
+	            1 - rotation_ration(avatar.getRotation()[0]),
+	            0);
+	    
 	    gl.glTranslated(-(avatar.getPosition()[0] + avatar.getLook()[0]), 
 	            -(avatar.getPosition()[1] + avatar.getLook()[1]), 
 	            -(avatar.getPosition()[2] + avatar.getLook()[2]));
@@ -113,7 +139,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	    // Center the world to 0,0
 	    gl.glTranslated(-this.terrain.size().getWidth() / 2, 
                 -this.terrain.size().getHeight() / 2, 0);
-	    
+        
         // Draw axis'
         gl.glBegin(GL2.GL_LINES);
         {
@@ -131,29 +157,30 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         }
         gl.glEnd();
 
+        setUpLighting(gl);
         this.terrain.display(drawable);
-	}
+    }
 
-	@Override
-	public void dispose(GLAutoDrawable drawable) {}
+    @Override
+    public void dispose(GLAutoDrawable drawable) {}
 
-	@Override
-	public void init(GLAutoDrawable drawable)
-	{
-	    avatar = new Avatar();
-	    avatar.reset();
-	    GL2 gl = drawable.getGL().getGL2();
-	    gl.glClearColor(0.2f, 0.2f, 1f, 1f);
-	    // Makes sure that the objects are drawn in the right order
+    @Override
+    public void init(GLAutoDrawable drawable)
+    {
+        avatar = new Avatar();
+        avatar.reset();
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glClearColor(0.2f, 0.2f, 1f, 1f);
+        // Makes sure that the objects are drawn in the right order
         gl.glEnable(GL2.GL_DEPTH_TEST);
         // enable lighting
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_LIGHT0);
         gl.glEnable(GL2.GL_NORMALIZE);
-	    
-	    gl.glEnable(GL2.GL_TEXTURE_2D);
-	    this.terrain.init(drawable);
-	}
+        
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        this.terrain.init(drawable);
+    }
     
     /**
      * Setup the light properly.
@@ -171,12 +198,14 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         {
             double light_angle = light_step * (2 * Math.PI / light_slices);
             
-            light_position[0] = (float) ((this.terrain.size().getWidth() / 2) 
-                    + light_radius * Math.cos(light_angle));
-            light_position[1] = (float) ((this.terrain.size().getHeight() / 2) 
-                    + light_radius * Math.sin(light_angle));
+//            light_position[0] = (float) ((this.terrain.size().getWidth() / 2) 
+//                    + light_radius * Math.cos(light_angle));
+//            light_position[1] = (float) ((this.terrain.size().getHeight() / 2) 
+//                    + light_radius * Math.sin(light_angle));
 //            light_position[2] = (float) ((this.terrain.size().getHeight() / 2) 
 //                    + light_radius * Math.sin(light_angle));
+            light_position[0] = (float) (light_radius * Math.cos(light_angle));
+            light_position[1] = (float) (light_radius * Math.sin(light_angle));
             light_position[2] = 5;
             light_step++;
         }
