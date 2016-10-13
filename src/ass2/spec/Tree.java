@@ -119,6 +119,7 @@ public class Tree {
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
         
         gl.glPushMatrix();
+            gl.glColor4d(1, 0, 0, 1);
             gl.glTranslated(0, 0, z + 0.9);
             GLUT glut = new GLUT();
             glut.glutSolidSphere(1, 40, 40);
