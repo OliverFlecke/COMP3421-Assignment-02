@@ -9,13 +9,23 @@ package ass2.spec;
  */
 public class Avatar 
 {
+    // Movement constants
+    private final double SPRINT_MOVEMENT_SPEED = 0.5;
+    private final double BASE_MOVEMENT_SPEED = 0.1;
+    
+    private final double SPRINT_ROTATION_SPEED = 5;
+    private final double BASE_ROTATION_SPEED = 1;
+    
     private double[] position;
     private double[] rotation;
     private double[] look;
     
-    private double position_step = 0.1;
-    private double angle_step = 1;
+    private double movementSpeed = BASE_MOVEMENT_SPEED;
+    private double rotationSpeed = BASE_ROTATION_SPEED;
     
+    /**
+     * Create an avatar 
+     */
     public Avatar()
     {
         reset();
@@ -26,8 +36,8 @@ public class Avatar
      */
     public void moveRight()
     {
-        position[0] += position_step * Math.cos(rotation[0] / 180 * Math.PI);
-        position[1] += position_step * (-Math.sin(rotation[0] / 180 * Math.PI));
+        position[0] += movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
+        position[1] += movementSpeed * (-Math.sin(rotation[0] / 180 * Math.PI));
     }
     
     /**
@@ -35,8 +45,8 @@ public class Avatar
      */
     public void moveLeft()
     {
-        position[0] -= position_step * Math.cos(rotation[0] / 180 * Math.PI);
-        position[1] -= position_step * (-Math.sin(rotation[0] / 180 * Math.PI));
+        position[0] -= movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
+        position[1] -= movementSpeed * (-Math.sin(rotation[0] / 180 * Math.PI));
     }
     
     /**
@@ -44,8 +54,8 @@ public class Avatar
      */
     public void moveForward()
     {
-        position[1] += position_step * Math.cos(rotation[0] / 180 * Math.PI);
-        position[0] += position_step * Math.sin(rotation[0] / 180 * Math.PI);
+        position[1] += movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
+        position[0] += movementSpeed * Math.sin(rotation[0] / 180 * Math.PI);
     }
     
     /**
@@ -53,8 +63,8 @@ public class Avatar
      */
     public void moveBackward()
     {
-        position[1] -= position_step * Math.cos(rotation[0] / 180 * Math.PI);
-        position[0] -= position_step * Math.sin(rotation[0] / 180 * Math.PI);
+        position[1] -= movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
+        position[0] -= movementSpeed * Math.sin(rotation[0] / 180 * Math.PI);
     }
     
     /**
@@ -64,7 +74,7 @@ public class Avatar
     {
         if (rotation[1] > -80)
         {
-            rotation[1] -= angle_step;
+            rotation[1] -= rotationSpeed;
         }
     }
     
@@ -75,7 +85,7 @@ public class Avatar
     {
         if (rotation[1] < 80)
         {
-            rotation[1] += angle_step;
+            rotation[1] += rotationSpeed;
         }
     }
     
@@ -84,7 +94,7 @@ public class Avatar
      */
     public void lookRight()
     {
-        rotation[0] += angle_step;
+        rotation[0] += rotationSpeed;
         if (rotation[0] >= 360)
         {
             rotation[0] = 0;
@@ -96,7 +106,7 @@ public class Avatar
      */
     public void lookLeft()
     {
-        rotation[0] -= angle_step;
+        rotation[0] -= rotationSpeed;
         if (rotation[0] <= 0)
         {
             rotation[0] = 359;
@@ -108,9 +118,9 @@ public class Avatar
      */
     public void reset()
     {
-        position = new double[] { 0, 5, 0 };
+        position = new double[] { 0, 5, 1 };
         rotation = new double[] { 0, 0, 0 };
-        look = new double[] { 0, -10, 5 };
+        look = new double[] { 0, -10, 1 };
     }
     
     /**
@@ -135,5 +145,20 @@ public class Avatar
     public double[] getRotation()
     {
         return this.rotation;
+    }
+
+    public void startSprinting()
+    {
+        movementSpeed = SPRINT_MOVEMENT_SPEED;
+        rotationSpeed = SPRINT_ROTATION_SPEED;
+    }
+    
+    /**
+     * Stop the avatar from sprinting
+     */
+    public void stopSprinting()
+    {
+        movementSpeed = BASE_MOVEMENT_SPEED;
+        rotationSpeed = BASE_ROTATION_SPEED;
     }
 }

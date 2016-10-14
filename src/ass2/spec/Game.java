@@ -203,13 +203,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         if (dynamic_lightning)
         {
             double light_angle = light_step * (2 * Math.PI / light_slices);
-            
-//            light_position[0] = (float) ((this.terrain.size().getWidth() / 2) 
-//                    + light_radius * Math.cos(light_angle));
-//            light_position[1] = (float) ((this.terrain.size().getHeight() / 2) 
-//                    + light_radius * Math.sin(light_angle));
-//            light_position[2] = (float) ((this.terrain.size().getHeight() / 2) 
-//                    + light_radius * Math.sin(light_angle));
             light_position[0] = (float) (light_radius * Math.cos(light_angle));
             light_position[1] = (float) (light_radius * Math.sin(light_angle));
             light_position[2] = 5;
@@ -247,7 +240,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener
             case KeyEvent.VK_L:
                 dynamic_lightning = !dynamic_lightning;
                 break;
-                
+            case KeyEvent.VK_SHIFT:
+                avatar.startSprinting();
+                break;
             
             // Move the camera around with the arrow keys
             case KeyEvent.VK_RIGHT:
@@ -284,7 +279,17 @@ public class Game extends JFrame implements GLEventListener, KeyListener
     }
     
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) 
+    {
+        switch (e.getKeyCode())
+        {
+            case KeyEvent.VK_SHIFT:
+                avatar.stopSprinting();
+                break;
+            default:
+                break;
+        }
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {}
