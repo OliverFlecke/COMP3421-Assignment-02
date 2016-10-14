@@ -4,8 +4,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
 import com.jogamp.opengl.*;
@@ -84,6 +88,10 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         animator.add(panel);
         animator.start();
         
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "blank cursor");
+        this.getContentPane().setCursor(blankCursor);
+//        this.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         this.getContentPane().add(panel);
         this.setSize(1400, 1200);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -94,7 +102,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     
     /**
      * Load a level file and display it.
-     * 
      * @param args - The first argument is a level file in JSON format
      * @throws FileNotFoundException
      */
@@ -105,9 +112,10 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     }
     
     /**
-     * Needs better name and explenation for what it actually calculates
+     * Calculate the vector (x and y are each other inverse) for rotating up and down,
+     * after having rotating the world around the z axis
      * @param angle which the rotation should consider
-     * @return 
+     * @return Vector value for rotating up and down after rotating around the z axis
      */
     private double rotation_ration(double angle)
     {
@@ -395,7 +403,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         int x = e.getX();
         int y = e.getY();
         
-        if (time > 50)
+        if (time > 50) // If the mouse hasn't been mode for x ms, center the mouse
         {
             mouseMover.mouseMove(this.getWidth() / 2, this.getHeight() / 2);
             x = this.getWidth() / 2;
