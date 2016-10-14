@@ -2,6 +2,8 @@ package ass2.spec;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import com.jogamp.opengl.*;
@@ -19,8 +21,18 @@ import com.jogamp.opengl.util.gl2.GLUT;
  *
  * @author Oliver Fleckenstein
  */
-public class Game extends JFrame implements GLEventListener, KeyListener 
+public class Game extends JFrame implements GLEventListener, KeyListener, MouseMotionListener 
 {
+    private final int RIGHT_KEY = 0,
+            LEFT_KEY    = 1,
+            UP_KEY      = 2,
+            DOWN_KEY    = 3,
+            LOOK_UP     = 4,
+            LOOK_DOWN   = 5,
+            LOOK_LEFT   = 6,
+            LOOK_RIGHT  = 7;
+    private boolean[] keysBeingPressed = new boolean[8];
+    
     // Variables for lightning
     private boolean dynamic_lightning = true;
     private float[] light_position = new float[3];
@@ -51,7 +63,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         GLJPanel panel = new GLJPanel(caps);
         panel.addGLEventListener(this);
         panel.addKeyListener(this);
-
+        panel.addMouseMotionListener(this);
         // Add an animator to call 'display' at 60fps        
         FPSAnimator animator = new FPSAnimator(60);
         animator.add(panel);
@@ -227,37 +239,56 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
     
-	
-	private boolean[] arrowKeysPressed = new boolean[4];
-	private final int RIGHT_KEY = 0,
-	        LEFT_KEY = 1,
-	        UP_KEY = 2,
-	        DOWN_KEY = 3;
-	
     @Override
     public void keyPressed(KeyEvent e) 
     {
+        int key = e.getKeyCode();
+        
         // Move the camera around with the arrow keys
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT || arrowKeysPressed[RIGHT_KEY])
+        if (key == KeyEvent.VK_RIGHT || keysBeingPressed[RIGHT_KEY])
         {
-            arrowKeysPressed[RIGHT_KEY] = true;
+            keysBeingPressed[RIGHT_KEY] = true;
             avatar.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT || arrowKeysPressed[LEFT_KEY])
+        if (key == KeyEvent.VK_LEFT || keysBeingPressed[LEFT_KEY])
         {
-            arrowKeysPressed[LEFT_KEY] = true;
+            keysBeingPressed[LEFT_KEY] = true;
             avatar.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_UP || arrowKeysPressed[UP_KEY])
+        if (key == KeyEvent.VK_UP || keysBeingPressed[UP_KEY])
         {
-            arrowKeysPressed[UP_KEY] = true;
+            keysBeingPressed[UP_KEY] = true;
             avatar.moveForward();
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN || arrowKeysPressed[DOWN_KEY])
+        if (key == KeyEvent.VK_DOWN || keysBeingPressed[DOWN_KEY])
         {
-            arrowKeysPressed[DOWN_KEY] = true;
+            keysBeingPressed[DOWN_KEY] = true;
             avatar.moveBackward();
         }
+        
+        // Look around / Rotate the world
+        if (key == KeyEvent.VK_COMMA || keysBeingPressed[LOOK_UP])
+        {
+            keysBeingPressed[LOOK_UP] = true;
+            avatar.lookUp();
+        }
+        if (key == KeyEvent.VK_O || keysBeingPressed[LOOK_DOWN])
+        {
+            keysBeingPressed[LOOK_DOWN] = true;
+            avatar.lookDown();
+        }
+        if (key == KeyEvent.VK_E || keysBeingPressed[LOOK_RIGHT])
+        {
+            keysBeingPressed[LOOK_RIGHT] = true;
+            avatar.lookRight();
+        }
+        if (key == KeyEvent.VK_A || keysBeingPressed[LOOK_LEFT])
+        {
+            keysBeingPressed[LOOK_LEFT] = true;
+            avatar.lookLeft();
+        }
+        
+        
         
         switch (e.getKeyCode())
         {
@@ -273,24 +304,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener
                 avatar.startSprinting();
                 break;
                 
-            // Rotate the world
-            case KeyEvent.VK_E:
-                avatar.lookRight();
-                break;
-            case KeyEvent.VK_A:
-                avatar.lookLeft();
-                break;
-            case KeyEvent.VK_COMMA:
-                avatar.lookUp();
-                break;
-            case KeyEvent.VK_O:
-                avatar.lookDown();
-                break;
-                
             default:
                 break;
         }
-//        System.out.println("dx: " + camera_look[0] + " \tdy: " + camera_look[1] + " \tdz: " + camera_look[2]);
     }
     
     @Override
@@ -303,16 +319,29 @@ public class Game extends JFrame implements GLEventListener, KeyListener
                 break;
                 
             case KeyEvent.VK_RIGHT:
-                arrowKeysPressed[RIGHT_KEY] = false;
+                keysBeingPressed[RIGHT_KEY] = false;
                 break;
             case KeyEvent.VK_LEFT:
-                arrowKeysPressed[LEFT_KEY] = false;
+                keysBeingPressed[LEFT_KEY] = false;
                 break;
             case KeyEvent.VK_UP:
-                arrowKeysPressed[UP_KEY] = false;
+                keysBeingPressed[UP_KEY] = false;
                 break;
             case KeyEvent.VK_DOWN:
-                arrowKeysPressed[DOWN_KEY] = false;
+                keysBeingPressed[DOWN_KEY] = false;
+                break;
+                
+            case KeyEvent.VK_COMMA:
+                keysBeingPressed[LOOK_UP] = false;
+                break;
+            case KeyEvent.VK_O:
+                keysBeingPressed[LOOK_DOWN] = false;
+                break;
+            case KeyEvent.VK_E:
+                keysBeingPressed[LOOK_RIGHT] = false;
+                break;
+            case KeyEvent.VK_A:
+                keysBeingPressed[LOOK_LEFT] = false;
                 break;
             default:
                 break;
@@ -321,4 +350,16 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 
     @Override
     public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void mouseDragged(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
 }
