@@ -227,9 +227,38 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
     
+	
+	private boolean[] arrowKeysPressed = new boolean[4];
+	private final int RIGHT_KEY = 0,
+	        LEFT_KEY = 1,
+	        UP_KEY = 2,
+	        DOWN_KEY = 3;
+	
     @Override
     public void keyPressed(KeyEvent e) 
     {
+        // Move the camera around with the arrow keys
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT || arrowKeysPressed[RIGHT_KEY])
+        {
+            arrowKeysPressed[RIGHT_KEY] = true;
+            avatar.moveRight();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT || arrowKeysPressed[LEFT_KEY])
+        {
+            arrowKeysPressed[LEFT_KEY] = true;
+            avatar.moveLeft();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP || arrowKeysPressed[UP_KEY])
+        {
+            arrowKeysPressed[UP_KEY] = true;
+            avatar.moveForward();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN || arrowKeysPressed[DOWN_KEY])
+        {
+            arrowKeysPressed[DOWN_KEY] = true;
+            avatar.moveBackward();
+        }
+        
         switch (e.getKeyCode())
         {
             // Reset variables
@@ -243,21 +272,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener
             case KeyEvent.VK_SHIFT:
                 avatar.startSprinting();
                 break;
-            
-            // Move the camera around with the arrow keys
-            case KeyEvent.VK_RIGHT:
-                avatar.moveRight();
-                break;
-            case KeyEvent.VK_LEFT:
-                avatar.moveLeft();
-                break;
-            case KeyEvent.VK_UP:
-                avatar.moveForward();
-                break;
-            case KeyEvent.VK_DOWN:
-                avatar.moveBackward();
-                break;
-
+                
             // Rotate the world
             case KeyEvent.VK_E:
                 avatar.lookRight();
@@ -285,6 +300,19 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         {
             case KeyEvent.VK_SHIFT:
                 avatar.stopSprinting();
+                break;
+                
+            case KeyEvent.VK_RIGHT:
+                arrowKeysPressed[RIGHT_KEY] = false;
+                break;
+            case KeyEvent.VK_LEFT:
+                arrowKeysPressed[LEFT_KEY] = false;
+                break;
+            case KeyEvent.VK_UP:
+                arrowKeysPressed[UP_KEY] = false;
+                break;
+            case KeyEvent.VK_DOWN:
+                arrowKeysPressed[DOWN_KEY] = false;
                 break;
             default:
                 break;
