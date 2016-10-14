@@ -52,6 +52,8 @@ public class Avatar
         rotation = new double[] { 0, 0 };
         position = new double[] { 0, 0, 0 };
         look = new double[] { 0, 5, 0 };
+        movementSpeed = BASE_MOVEMENT_SPEED;
+        rotationSpeed = BASE_ROTATION_SPEED;
     }
     
     /**
@@ -62,14 +64,11 @@ public class Avatar
     {
         GL2 gl = drawable.getGL().getGL2();
         gl.glPushMatrix();
-        gl.glTranslated(position[0], position[1], position[2]);
-        glu.glutSolidCylinder(0.1, 1, 100, 10);
-        
-        gl.glBegin(GL2.GL_QUAD_STRIP);
         {
-            
+            gl.glColor3d(1, 0, 0);
+            gl.glTranslated(position[0], position[1], position[2]);
+            glu.glutSolidCylinder(0.1, 1, 100, 10);
         }
-        gl.glEnd();
         gl.glPopMatrix();
     }
     

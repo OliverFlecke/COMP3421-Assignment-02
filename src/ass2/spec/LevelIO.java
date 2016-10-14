@@ -88,7 +88,7 @@ public class LevelIO {
     public static void save(Terrain terrain, File file) throws IOException {
         JSONObject json = new JSONObject();
                 
-        Dimension size = terrain.size();
+        Dimension size = terrain.getSize();
         json.put("width", size.width);
         json.put("depth", size.height);
 
@@ -108,7 +108,7 @@ public class LevelIO {
         json.put("altitude", altitude);
         
         JSONArray trees = new JSONArray();
-        for (Tree t : terrain.trees()) {
+        for (Tree t : terrain.getTrees()) {
             JSONObject j = new JSONObject();
             double[] position = t.getPosition();
             j.put("x", position[0]);
@@ -118,7 +118,7 @@ public class LevelIO {
         json.put("trees", trees);
 
         JSONArray roads = new JSONArray();
-        for (Road r : terrain.roads()) {
+        for (Road r : terrain.getRoads()) {
             JSONObject j = new JSONObject();
             j.put("width", r.width());
             

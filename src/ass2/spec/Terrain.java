@@ -7,6 +7,8 @@ import java.util.List;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 
@@ -25,8 +27,15 @@ public class Terrain {
     private double[][] altitude;
     private List<Tree> trees;
     private List<Road> roads;
-    private float[] sunlight;
     private Texture[] textures;
+    
+    // Variables for lightning
+    private float[] dynamic_sunlight;
+    private int light_slices = 250;
+    private int light_step = 0;
+    private float light_radius = 10f;
+    private float[] static_sunlight;
+    private boolean dynamic_lightning = true;
 
     /**
      * Create a new terrain
@@ -39,27 +48,38 @@ public class Terrain {
         this.altitude = new double[width][depth];
         this.trees = new ArrayList<Tree>();
         this.roads = new ArrayList<Road>();
-        this.sunlight = new float[3];
+        this.static_sunlight = new float[3];
+        this.dynamic_sunlight = new float[3];
     }
     
     public Terrain(Dimension size) {
         this(size.width, size.height);
     }
 
-    public Dimension size() {
+    public Dimension getSize() {
         return this.size;
     }
 
-    public List<Tree> trees() {
+    public List<Tree> getTrees() {
         return this.trees;
     }
 
-    public List<Road> roads() {
+    public List<Road> getRoads() {
         return this.roads;
     }
 
+    /**
+     * @return The current position of the sun
+     */
     public float[] getSunlight() {
-        return this.sunlight;
+        if (dynamic_lightning)
+        {
+            return this.dynamic_sunlight;
+        }
+        else 
+        {
+            return this.static_sunlight;
+        }
     }
 
     /**
@@ -72,9 +92,9 @@ public class Terrain {
      * @param dz
      */
     public void setSunlightDir(float dx, float dy, float dz) {
-        this.sunlight[0] = dx;
-        this.sunlight[1] = dy;
-        this.sunlight[2] = dz;        
+        this.static_sunlight[0] = dx;
+        this.static_sunlight[1] = dy;
+        this.static_sunlight[2] = dz;        
     }
     
     /**
@@ -164,6 +184,7 @@ public class Terrain {
      */
     public void display(GLAutoDrawable drawable) 
     {
+        calculateDynamicSunlightPosition();
         GL2 gl = drawable.getGL().getGL2();
         
         // Load the texture
@@ -221,12 +242,34 @@ public class Terrain {
             }
         }
         
+        gl.glTranslatef(getSunlight()[0], getSunlight()[1], getSunlight()[2]);
+        gl.glColor3d(1, 1, 0);
+        Game.glut.glutSolidSphere(1, 100, 100);
+        gl.glTranslatef(-getSunlight()[0], -getSunlight()[1], -getSunlight()[2]);
+        
         for (Tree tree : this.trees) 
         {
             tree.display(drawable);
         }
+        
+        for (Road road : this.getRoads())
+        {
+            road.display(drawable);
+        }
     }
     
+    /**
+     * Calculates the dynamic position of the sun 
+     */
+    private void calculateDynamicSunlightPosition()
+    {
+        double light_angle = light_step * (2 * Math.PI / light_slices);
+        dynamic_sunlight[0] = (float) (light_radius * Math.cos(light_angle));
+        dynamic_sunlight[1] = (float) (light_radius * Math.sin(light_angle));
+        dynamic_sunlight[2] = 5;
+        light_step++;
+    }
+
     public void init(GLAutoDrawable drawable)
     {
         GL2 gl = drawable.getGL().getGL2();
@@ -234,11 +277,24 @@ public class Terrain {
         textures = new Texture[1];
         textures[0] = new Texture(gl, textureFileName1, textureExt1, true);
         
-        for (Tree tree : trees) 
+        for (Tree tree : getTrees()) 
         {
             tree.setTerrain(this);
             tree.init(drawable);
         }
+        
+        for (Road road : getRoads())
+        {
+            road.init(drawable);
+        }
+    }
+
+    /**
+     * Switch the lightning between dynamic and static
+     */
+    public void switchLightning() 
+    {
+        this.dynamic_lightning = !this.dynamic_lightning;
     }
 
     

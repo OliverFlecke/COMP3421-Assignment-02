@@ -18,6 +18,7 @@ import com.jogamp.opengl.glu.GLU;
 
 import javax.swing.JFrame;
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 
@@ -29,6 +30,7 @@ import com.jogamp.opengl.util.FPSAnimator;
 public class Game extends JFrame implements GLEventListener, KeyListener, MouseMotionListener 
 {
     private static final long serialVersionUID = -3503485707097285491L;
+    public static GLUT glut = new GLUT();
     
     private final int RIGHT_KEY = 0,
             LEFT_KEY    = 1,
@@ -47,13 +49,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     private Robot mouseMover; // Class used to move the mouse to the center of the screen
     
     private GLU glu;
-    
-    // Variables for lightning
-    private boolean dynamic_lightning = true;
-    private float[] light_position = new float[3];
-    private int light_slices = 250;
-    private int light_step = 0;
-    private float light_radius = 10f;
     
     private Terrain terrain;
     private Avatar avatar;
@@ -145,7 +140,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    
-	    glu.gluPerspective(60, 1, 1, 100);
+	    glu.gluPerspective(60, 1, 0.1, 40);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
@@ -168,7 +163,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	    
 	    
 	    // Rotate the world around the player
-	    gl.glTranslated(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2]);
+	    gl.glTranslated(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1);
             // Rotate around the z axis
             gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
             // Rotate up and down - The x and y axis need to be calculated
@@ -186,7 +181,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             {
                 gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
             }
-        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -avatar.getPosition()[2]);
+        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -(avatar.getPosition()[2] + 1));
         
         drawCoordinateAxis(gl);
 
@@ -249,25 +244,12 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         float lightDifAndSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         float globAmb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
         
-        if (dynamic_lightning)
-        {
-            double light_angle = light_step * (2 * Math.PI / light_slices);
-            light_position[0] = (float) (light_radius * Math.cos(light_angle));
-            light_position[1] = (float) (light_radius * Math.sin(light_angle));
-            light_position[2] = 5;
-            light_step++;
-        }
-        else 
-        {
-            light_position = terrain.getSunlight();
-        }
-        
         gl.glEnable(GL2.GL_LIGHT0);
         // Set light properties.
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, light_position,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, terrain.getSunlight(), 0);
         
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
         gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
@@ -335,7 +317,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
                 break;
             // Switch dynamic lightning on/off
             case KeyEvent.VK_L:
-                dynamic_lightning = !dynamic_lightning;
+                terrain.switchLightning();
                 break;
             case KeyEvent.VK_SHIFT:
                 avatar.startSprinting();

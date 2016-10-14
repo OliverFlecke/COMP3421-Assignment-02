@@ -3,6 +3,8 @@ package ass2.spec;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GLAutoDrawable;
+
 /**
  * COMMENT: Comment Road 
  *
@@ -127,24 +129,37 @@ public class Road {
      */
     private double b(int i, double t) {
         
-        switch(i) {
-        
-        case 0:
-            return (1-t) * (1-t) * (1-t);
-
-        case 1:
-            return 3 * (1-t) * (1-t) * t;
-            
-        case 2:
-            return 3 * (1-t) * t * t;
-
-        case 3:
-            return t * t * t;
+        switch(i)
+        {
+            case 0:
+                return (1-t) * (1-t) * (1-t);
+                
+            case 1:
+                return 3 * (1-t) * (1-t) * t;
+                
+            case 2:
+                return 3 * (1-t) * t * t;
+                
+            case 3:
+                return t * t * t;
+                
         }
         
         // this should never happen
         throw new IllegalArgumentException("" + i);
     }
 
+    /**
+     * Draw and display the road
+     * @param drawable
+     */
+    public void display(GLAutoDrawable drawable) 
+    {
+        // TODO
+    }
 
+    public void init(GLAutoDrawable drawable) {
+        // TODO Auto-generated method stub
+        
+    }
 }
