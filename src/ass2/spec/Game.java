@@ -86,6 +86,8 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         
         this.getContentPane().add(panel);
         this.setSize(1400, 1200);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setUndecorated(true);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
