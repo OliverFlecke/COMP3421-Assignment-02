@@ -73,10 +73,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener
         Terrain terrain = LevelIO.load(new File(args[0]));
         Game game = new Game(terrain);
         game.run();
-//        for (int angle = 0; angle < 360; angle++)
-//        {
-//            System.out.println(angle + "," + game.rotation_ration(angle));
-//        }
     }
     
     /**
@@ -84,16 +80,16 @@ public class Game extends JFrame implements GLEventListener, KeyListener
      * @param angle which the rotation should consider
      * @return 
      */
-    public double rotation_ration(double angle)
+    private double rotation_ration(double angle)
     {
         double output = (90.0 - angle % 90.0) / 90.0;
         if ((angle >= 90 && angle < 180) || (angle >= 270 && angle < 360))
         {
-            return 1 - output;
+            return (1 - output);
         }
         else 
         {
-            return output;
+            return -output;
         }
     }
     
@@ -126,15 +122,26 @@ public class Game extends JFrame implements GLEventListener, KeyListener
 	            avatar.getPosition()[1] + avatar.getLook()[1], 
 	            avatar.getPosition()[2] + avatar.getLook()[2]);
 	    
-	    gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
-	    gl.glRotated(avatar.getRotation()[1],
-	            rotation_ration(avatar.getRotation()[0]),
-	            1 - rotation_ration(avatar.getRotation()[0]),
-	            0);
-	    
-	    gl.glTranslated(-(avatar.getPosition()[0] + avatar.getLook()[0]), 
-	            -(avatar.getPosition()[1] + avatar.getLook()[1]), 
-	            -(avatar.getPosition()[2] + avatar.getLook()[2]));
+            // Rotate around the z axis
+            gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
+            // Rotate up and down - The x and y axis need to be calculated
+            double ratio = rotation_ration(avatar.getRotation()[0]);
+            double angle = avatar.getRotation()[1];
+            if (avatar.getRotation()[0] > 90 && avatar.getRotation()[0] <= 270)
+            {
+                angle = -angle;
+            }
+            if (ratio > 0)
+            {
+                gl.glRotated(angle, ratio, 1.0 - ratio, 0);
+            }
+            else 
+            {
+                gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
+            }
+        gl.glTranslated(-(avatar.getPosition()[0] + avatar.getLook()[0]), 
+                -(avatar.getPosition()[1] + avatar.getLook()[1]), 
+                -(avatar.getPosition()[2] + avatar.getLook()[2]));
         
 	    // Center the world to 0,0
 	    gl.glTranslated(-this.terrain.size().getWidth() / 2, 
@@ -168,7 +175,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener
     public void init(GLAutoDrawable drawable)
     {
         avatar = new Avatar();
-        avatar.reset();
         GL2 gl = drawable.getGL().getGL2();
         gl.glClearColor(0.2f, 0.2f, 1f, 1f);
         // Makes sure that the objects are drawn in the right order
