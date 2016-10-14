@@ -63,13 +63,17 @@ public class Avatar
     public void display(GLAutoDrawable drawable)
     {
         GL2 gl = drawable.getGL().getGL2();
-        gl.glPushMatrix();
+        
+        if (getViewMode() == THRID_PERSON_MODE)
         {
-            gl.glColor3d(1, 0, 0);
-            gl.glTranslated(position[0], position[1], position[2]);
-            glu.glutSolidCylinder(0.1, 1, 100, 10);
+            gl.glPushMatrix();
+            {
+                gl.glColor3d(1, 0, 0);
+                gl.glTranslated(position[0], position[1], position[2]);
+                glu.glutSolidCylinder(0.1, 1, 100, 10);
+            }
+            gl.glPopMatrix();
         }
-        gl.glPopMatrix();
     }
     
     public void addAngleToZ(double angle) 
