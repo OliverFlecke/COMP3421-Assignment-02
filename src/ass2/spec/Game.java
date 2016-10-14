@@ -4,6 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import com.jogamp.opengl.*;
@@ -23,6 +25,8 @@ import com.jogamp.opengl.util.gl2.GLUT;
  */
 public class Game extends JFrame implements GLEventListener, KeyListener, MouseMotionListener 
 {
+    private static final long serialVersionUID = -3503485707097285491L;
+    
     private final int RIGHT_KEY = 0,
             LEFT_KEY    = 1,
             UP_KEY      = 2,
@@ -32,6 +36,12 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             LOOK_LEFT   = 6,
             LOOK_RIGHT  = 7;
     private boolean[] keysBeingPressed = new boolean[8];
+    
+    // Mouse variables
+    private double mouseRotationFactor = 25;
+    private int mouseLastX = 0, mouseLastY = 0;
+    private long mouseLastTime = 0;
+    private Robot mouseMover; // Class used to move the mouse to the center of the screen
     
     // Variables for lightning
     private boolean dynamic_lightning = true;
@@ -63,6 +73,11 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         GLJPanel panel = new GLJPanel(caps);
         panel.addGLEventListener(this);
         panel.addKeyListener(this);
+        try {
+            mouseMover = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
         panel.addMouseMotionListener(this);
         // Add an animator to call 'display' at 60fps        
         FPSAnimator animator = new FPSAnimator(60);
@@ -350,16 +365,47 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 
     @Override
     public void keyTyped(KeyEvent e) {}
-
-    @Override
-    public void mouseDragged(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
+    
+    private void lookAround(int x, int y)
+    {
+        int dx = mouseLastX - x;
+        int dy = mouseLastY - y;
+        avatar.addAngleToXY(dy / mouseRotationFactor);
+        avatar.addAngleToZ(dx / mouseRotationFactor);
     }
-
+    
     @Override
-    public void mouseMoved(MouseEvent arg0) {
-        // TODO Auto-generated method stub
+    public void mouseDragged(MouseEvent e) 
+    {
+        int x = e.getX();
+        int y = e.getY();
         
+        lookAround(x, y);
+        
+        mouseLastX = x;
+        mouseLastY = y;
+    }
+    
+    @Override
+    public void mouseMoved(MouseEvent e) 
+    {
+        long time = System.currentTimeMillis() - mouseLastTime;
+        int x = e.getX();
+        int y = e.getY();
+        
+        if (time > 50)
+        {
+            mouseMover.mouseMove(this.getWidth() / 2, this.getHeight() / 2);
+            x = this.getWidth() / 2;
+            y = this.getHeight() / 2;
+        }
+        else
+        {
+            lookAround(x, y);
+        }
+        
+        mouseLastX = x;
+        mouseLastY = y;
+        mouseLastTime = System.currentTimeMillis();
     }
 }

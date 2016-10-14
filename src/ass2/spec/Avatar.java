@@ -31,6 +31,35 @@ public class Avatar
         reset();
     }
     
+    public void addAngleToZ(double angle) 
+    {
+        this.rotation[0] += angle;
+    }
+    
+    public void addAngleToXY(double angle)
+    {
+        this.rotation[1] += angle;
+    }
+    
+    /**
+     * Start sprinting - Increases movement and rotation speed
+     */
+    public void startSprinting()
+    {
+        movementSpeed = SPRINT_MOVEMENT_SPEED;
+        rotationSpeed = SPRINT_ROTATION_SPEED;
+    }
+    
+    /**
+     * Stop the avatar from sprinting
+     * Resets movement and rotation speed back to the base speed
+     */
+    public void stopSprinting()
+    {
+        movementSpeed = BASE_MOVEMENT_SPEED;
+        rotationSpeed = BASE_ROTATION_SPEED;
+    }
+    
     /**
      * Move the avatar to the right
      */
@@ -119,7 +148,7 @@ public class Avatar
     public void reset()
     {
         position = new double[] { 0, 5, 1 };
-        rotation = new double[] { 0, 0, 0 };
+        rotation = new double[] { 0, 0 };
         look = new double[] { 0, -10, 1 };
     }
     
@@ -145,20 +174,5 @@ public class Avatar
     public double[] getRotation()
     {
         return this.rotation;
-    }
-
-    public void startSprinting()
-    {
-        movementSpeed = SPRINT_MOVEMENT_SPEED;
-        rotationSpeed = SPRINT_ROTATION_SPEED;
-    }
-    
-    /**
-     * Stop the avatar from sprinting
-     */
-    public void stopSprinting()
-    {
-        movementSpeed = BASE_MOVEMENT_SPEED;
-        rotationSpeed = BASE_ROTATION_SPEED;
     }
 }
