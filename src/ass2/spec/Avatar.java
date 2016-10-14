@@ -28,7 +28,6 @@ public class Avatar
     {
         position[0] += position_step * Math.cos(rotation[0] / 180 * Math.PI);
         position[1] += position_step * (-Math.sin(rotation[0] / 180 * Math.PI));
-        System.out.println("Move right");
     }
     
     /**
@@ -38,7 +37,6 @@ public class Avatar
     {
         position[0] -= position_step * Math.cos(rotation[0] / 180 * Math.PI);
         position[1] -= position_step * (-Math.sin(rotation[0] / 180 * Math.PI));
-        System.out.println("Move left");
     }
     
     /**
@@ -48,7 +46,6 @@ public class Avatar
     {
         position[1] += position_step * Math.cos(rotation[0] / 180 * Math.PI);
         position[0] += position_step * Math.sin(rotation[0] / 180 * Math.PI);
-        System.out.println("Move up");
     }
     
     /**
@@ -56,10 +53,8 @@ public class Avatar
      */
     public void moveBackward()
     {
-        
         position[1] -= position_step * Math.cos(rotation[0] / 180 * Math.PI);
         position[0] -= position_step * Math.sin(rotation[0] / 180 * Math.PI);
-        System.out.println("Move down");
     }
     
     /**
