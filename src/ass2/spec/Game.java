@@ -18,7 +18,6 @@ import com.jogamp.opengl.glu.GLU;
 
 import javax.swing.JFrame;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.gl2.GLUT;
 
 
 
@@ -46,6 +45,8 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     private int mouseLastX = 0, mouseLastY = 0;
     private long mouseLastTime = 0;
     private Robot mouseMover; // Class used to move the mouse to the center of the screen
+    
+    private GLU glu;
     
     // Variables for lightning
     private boolean dynamic_lightning = true;
@@ -143,22 +144,31 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
-	    GLU glu = new GLU();
+	    
 	    glu.gluPerspective(60, 1, 1, 100);
-	    glu.gluLookAt(avatar.getPosition()[0] + avatar.getLook()[0], 
-	            avatar.getPosition()[1] + avatar.getLook()[1], 
-	            avatar.getPosition()[2] + avatar.getLook()[2], 
-	            avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2], 
-	            0, 1, 0);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
+	    if (avatar.getViewMode() == Avatar.THRID_PERSON_MODE)
+	    {
+	        glu.gluLookAt(avatar.getPosition()[0], avatar.getPosition()[1] - 2.5, avatar.getPosition()[2] + 2, 
+	                avatar.getPosition()[0] + avatar.getLook()[0], 
+	                avatar.getPosition()[1] + avatar.getLook()[1], 
+	                avatar.getPosition()[2] + avatar.getLook()[2], 
+	                0, 0, 1);
+	    }
+	    else
+	    {
+	        glu.gluLookAt(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1,
+	                avatar.getPosition()[0] + avatar.getLook()[0],
+	                avatar.getPosition()[1] + avatar.getLook()[1],
+	                avatar.getPosition()[2] + avatar.getLook()[2],
+	                0, 0, 1);
+	    }
+	    
 	    
 	    // Rotate the world around the player
-	    gl.glTranslated(avatar.getPosition()[0] + avatar.getLook()[0], 
-	            avatar.getPosition()[1] + avatar.getLook()[1], 
-	            avatar.getPosition()[2] + avatar.getLook()[2]);
-	    
+	    gl.glTranslated(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2]);
             // Rotate around the z axis
             gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
             // Rotate up and down - The x and y axis need to be calculated
@@ -176,14 +186,16 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             {
                 gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
             }
-        gl.glTranslated(-(avatar.getPosition()[0] + avatar.getLook()[0]), 
-                -(avatar.getPosition()[1] + avatar.getLook()[1]), 
-                -(avatar.getPosition()[2] + avatar.getLook()[2]));
+        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -avatar.getPosition()[2]);
         
-	    // Center the world to 0,0
-	    gl.glTranslated(-this.terrain.size().getWidth() / 2, 
-                -this.terrain.size().getHeight() / 2, 0);
-        
+        drawCoordinateAxis(gl);
+
+        setUpLighting(gl);
+        this.avatar.display(drawable);
+        this.terrain.display(drawable);
+    }
+
+    protected void drawCoordinateAxis(GL2 gl) {
         // Draw axis'
         gl.glBegin(GL2.GL_LINES);
         {
@@ -200,9 +212,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             gl.glVertex3d(0, 0, 1);
         }
         gl.glEnd();
-
-        setUpLighting(gl);
-        this.terrain.display(drawable);
     }
 
     @Override
@@ -222,6 +231,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glEnable(GL2.GL_NORMALIZE);
         
         gl.glEnable(GL2.GL_TEXTURE_2D);
+        
+        glu = new GLU();
+        
         this.terrain.init(drawable);
     }
     
@@ -328,7 +340,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             case KeyEvent.VK_SHIFT:
                 avatar.startSprinting();
                 break;
-                
+            case KeyEvent.VK_V:
+                avatar.switchViewMode();
+                break;
             default:
                 break;
         }

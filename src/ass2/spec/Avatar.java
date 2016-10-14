@@ -1,5 +1,10 @@
 package ass2.spec;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.util.gl2.GLUT;
+
 /**
  * An avatar, representing the player in the game. 
  * Is able to move and look around in the game world.
@@ -9,12 +14,18 @@ package ass2.spec;
  */
 public class Avatar 
 {
+    // View modes
+    public static final int FIRST_PERSON_MODE = 0;
+    public static final int THRID_PERSON_MODE = 1;
+    
     // Movement constants
     private final double SPRINT_MOVEMENT_SPEED = 0.5;
     private final double BASE_MOVEMENT_SPEED = 0.1;
     
     private final double SPRINT_ROTATION_SPEED = 5;
     private final double BASE_ROTATION_SPEED = 1;
+    
+    private GLUT glu = new GLUT();
     
     private double[] position;
     private double[] rotation;
@@ -23,12 +34,43 @@ public class Avatar
     private double movementSpeed = BASE_MOVEMENT_SPEED;
     private double rotationSpeed = BASE_ROTATION_SPEED;
     
+    private int viewMode = FIRST_PERSON_MODE;
+    
     /**
      * Create an avatar 
      */
     public Avatar()
     {
         reset();
+    }
+    
+    /**
+     * Reset the avatar to the original position, and looking in the original direction
+     */
+    public void reset()
+    {
+        rotation = new double[] { 0, 0 };
+        position = new double[] { 0, 0, 0 };
+        look = new double[] { 0, 5, 0 };
+    }
+    
+    /**
+     * Display the avatar
+     * @param drawable
+     */
+    public void display(GLAutoDrawable drawable)
+    {
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glPushMatrix();
+        gl.glTranslated(position[0], position[1], position[2]);
+        glu.glutSolidCylinder(0.1, 1, 100, 10);
+        
+        gl.glBegin(GL2.GL_QUAD_STRIP);
+        {
+            
+        }
+        gl.glEnd();
+        gl.glPopMatrix();
     }
     
     public void addAngleToZ(double angle) 
@@ -143,16 +185,6 @@ public class Avatar
     }
     
     /**
-     * Reset the avatar to the original position, and looking in the original direction
-     */
-    public void reset()
-    {
-        position = new double[] { 0, 5, 1 };
-        rotation = new double[] { 0, 0 };
-        look = new double[] { 0, -10, 1 };
-    }
-    
-    /**
      * @return The position of the avatar
      */
     public double[] getPosition()
@@ -174,5 +206,32 @@ public class Avatar
     public double[] getRotation()
     {
         return this.rotation;
+    }
+    
+    /**
+     * Switch the view mode between thrid person and first person mode
+     */
+    public void switchViewMode()
+    {
+        switch (viewMode)
+        {
+            case FIRST_PERSON_MODE:
+                viewMode = THRID_PERSON_MODE;
+                break;
+            case THRID_PERSON_MODE:
+                viewMode = FIRST_PERSON_MODE;
+                break;
+            default:
+                viewMode = FIRST_PERSON_MODE;
+                break;
+        }
+    }
+    
+    /**
+     * @return The current view mode
+     */
+    public int getViewMode()
+    {
+        return this.viewMode;
     }
 }
