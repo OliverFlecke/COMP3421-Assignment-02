@@ -4,11 +4,8 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.gl2.GLUT;
 
 
 
@@ -264,8 +261,8 @@ public class Terrain {
     private void calculateDynamicSunlightPosition()
     {
         double light_angle = light_step * (2 * Math.PI / light_slices);
-        dynamic_sunlight[0] = (float) (light_radius * Math.cos(light_angle));
-        dynamic_sunlight[1] = (float) (light_radius * Math.sin(light_angle));
+        dynamic_sunlight[0] = (float) (getSize().getWidth() / 2 + light_radius * Math.cos(light_angle));
+        dynamic_sunlight[1] = (float) (getSize().getHeight() / 2 + light_radius * Math.sin(light_angle));
         dynamic_sunlight[2] = 5;
         light_step++;
     }

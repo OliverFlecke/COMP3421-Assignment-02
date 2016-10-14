@@ -140,11 +140,19 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    
-	    glu.gluPerspective(60, 1, 0.1, 40);
+	    glu.gluPerspective(80, 1, 0.1, 40);
 	    
 	    gl.glMatrixMode(GL2.GL_MODELVIEW);
 	    gl.glLoadIdentity();
-	    if (avatar.getViewMode() == Avatar.THRID_PERSON_MODE)
+	    if (avatar.getViewMode() == ViewMode.FIRST_PERSON)
+	    {
+	        glu.gluLookAt(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1,
+	                avatar.getPosition()[0] + avatar.getLook()[0],
+	                avatar.getPosition()[1] + avatar.getLook()[1],
+	                avatar.getPosition()[2] + avatar.getLook()[2],
+	                0, 0, 1);
+	    }
+	    else if (avatar.getViewMode() == ViewMode.THRID_PERSON)
 	    {
 	        glu.gluLookAt(avatar.getPosition()[0], avatar.getPosition()[1] - 2.5, avatar.getPosition()[2] + 2, 
 	                avatar.getPosition()[0] + avatar.getLook()[0], 
@@ -152,12 +160,10 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	                avatar.getPosition()[2] + avatar.getLook()[2], 
 	                0, 0, 1);
 	    }
-	    else
+	    else if (avatar.getViewMode() == ViewMode.SUN)
 	    {
-	        glu.gluLookAt(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1,
-	                avatar.getPosition()[0] + avatar.getLook()[0],
-	                avatar.getPosition()[1] + avatar.getLook()[1],
-	                avatar.getPosition()[2] + avatar.getLook()[2],
+	        glu.gluLookAt(terrain.getSunlight()[0], terrain.getSunlight()[1], terrain.getSunlight()[2], 
+	                terrain.getSize().getWidth() / 2, terrain.getSize().getHeight() / 2, 0, 
 	                0, 0, 1);
 	    }
 	    

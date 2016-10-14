@@ -1,6 +1,5 @@
 package ass2.spec;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -14,10 +13,6 @@ import com.jogamp.opengl.util.gl2.GLUT;
  */
 public class Avatar 
 {
-    // View modes
-    public static final int FIRST_PERSON_MODE = 0;
-    public static final int THRID_PERSON_MODE = 1;
-    
     // Movement constants
     private final double SPRINT_MOVEMENT_SPEED = 0.5;
     private final double BASE_MOVEMENT_SPEED = 0.1;
@@ -34,7 +29,7 @@ public class Avatar
     private double movementSpeed = BASE_MOVEMENT_SPEED;
     private double rotationSpeed = BASE_ROTATION_SPEED;
     
-    private int viewMode = FIRST_PERSON_MODE;
+    private ViewMode viewMode = ViewMode.FIRST_PERSON;
     
     /**
      * Create an avatar 
@@ -64,7 +59,7 @@ public class Avatar
     {
         GL2 gl = drawable.getGL().getGL2();
         
-        if (getViewMode() == THRID_PERSON_MODE)
+        if (getViewMode() != ViewMode.FIRST_PERSON)
         {
             gl.glPushMatrix();
             {
@@ -218,14 +213,17 @@ public class Avatar
     {
         switch (viewMode)
         {
-            case FIRST_PERSON_MODE:
-                viewMode = THRID_PERSON_MODE;
+            case FIRST_PERSON:
+                viewMode = ViewMode.THRID_PERSON;
                 break;
-            case THRID_PERSON_MODE:
-                viewMode = FIRST_PERSON_MODE;
+            case THRID_PERSON:
+                viewMode = ViewMode.SUN;
+                break;
+            case SUN:
+                viewMode = ViewMode.FIRST_PERSON;
                 break;
             default:
-                viewMode = FIRST_PERSON_MODE;
+                viewMode = ViewMode.FIRST_PERSON;
                 break;
         }
     }
@@ -233,7 +231,7 @@ public class Avatar
     /**
      * @return The current view mode
      */
-    public int getViewMode()
+    public ViewMode getViewMode()
     {
         return this.viewMode;
     }
