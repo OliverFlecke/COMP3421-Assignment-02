@@ -14,9 +14,14 @@ public class Tree
 {
     private static Random random = new Random();
     
-    private String textureFileName = "src/textures/tree.jpg";
-    private String textureExt = "jpg";
-    private Texture texture;
+    private String textureFileNameTree = "src/textures/tree/tree.jpg";
+    private String textureExtTree = "jpg";
+    private String textureFileNameLeaf = "src/textures/leaves/Copa.jpg";
+    private String textureExtLeaf = "jpg";
+    private Texture treeTexture;
+    private Texture leafTexture;
+//    private final int TREE_TEXTURE = 0;
+//    private final int LEAF_TEXTURE = 1;
     
     private double[] position;
     private double radius;
@@ -71,7 +76,7 @@ public class Tree
         gl.glPolygonMode(GL2.GL_BACK, GL2.GL_LINE);
         // Side of the cylinder
         // Load the texture
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getTextureId());
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, treeTexture.getTextureId());
         gl.glBegin(GL2.GL_QUAD_STRIP);
         {
             double angle_step = 2 * Math.PI / slices;
@@ -93,9 +98,14 @@ public class Tree
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
         
         gl.glPushMatrix();
-            gl.glColor4d(1, 0, 0, 1);
             gl.glTranslated(0, 0, z_top + 0.9 * sphereRadius);
+            
+            gl.glEnable(GL2.GL_TEXTURE_GEN_S); //enable texture coordinate generation
+            gl.glEnable(GL2.GL_TEXTURE_GEN_T);
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, leafTexture.getTextureId());
             Game.glut.glutSolidSphere(sphereRadius, 40, 40);
+            gl.glDisable(GL2.GL_TEXTURE_GEN_S); //enable texture coordinate generation
+            gl.glDisable(GL2.GL_TEXTURE_GEN_T);
         gl.glPopMatrix();
         
         gl.glPopMatrix();
@@ -104,7 +114,8 @@ public class Tree
     public void init(GLAutoDrawable drawable) 
     {
         GL2 gl = drawable.getGL().getGL2();
-        texture = new Texture(gl, textureFileName, textureExt, true);
+        treeTexture = new Texture(gl, textureFileNameTree, textureExtTree, true);
+        leafTexture = new Texture(gl, textureFileNameLeaf, textureExtLeaf, true);
     }
 
     /**

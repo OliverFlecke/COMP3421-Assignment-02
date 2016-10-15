@@ -14,9 +14,9 @@ import com.jogamp.opengl.GLAutoDrawable;
 public class Road
 {
 //    private String textureFileName = "src/textures/road/tarmac.jpg";
-//    private String textureExt = ".jpg";
+//    private String textureExt = "jpg";
     private String textureFileName = "src/textures/road/asphalt.png";
-    private String textureExt = ".png";
+    private String textureExt = "png";
     private Texture texture;
     private Terrain terrain;
     private List<Double> points;

@@ -17,7 +17,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 public class Terrain {
     
     // Textures
-    private String textureFileName1 = "src/textures/tileable_grass_00.png";
+    private String textureFileName1 = "src/textures/terrain/tileable_grass_00.png";
     private String textureExt1 = "png";
     
     private Dimension size;
