@@ -3,6 +3,7 @@ package ass2.spec;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
 /**
@@ -10,19 +11,20 @@ import com.jogamp.opengl.GLAutoDrawable;
  *
  * @author malcolmr
  */
-public class Road {
-
-    private List<Double> myPoints;
-    private double myWidth;
+public class Road
+{
+    private Terrain terrain;
+    private List<Double> points;
+    private double width;
     
     /** 
      * Create a new road starting at the specified point
      */
     public Road(double width, double x0, double y0) {
-        myWidth = width;
-        myPoints = new ArrayList<Double>();
-        myPoints.add(x0);
-        myPoints.add(y0);
+        this.width = width;
+        points = new ArrayList<Double>();
+        points.add(x0);
+        points.add(y0);
     }
 
     /**
@@ -32,10 +34,10 @@ public class Road {
      * @param spine
      */
     public Road(double width, double[] spine) {
-        myWidth = width;
-        myPoints = new ArrayList<Double>();
+        this.width = width;
+        points = new ArrayList<Double>();
         for (int i = 0; i < spine.length; i++) {
-            myPoints.add(spine[i]);
+            points.add(spine[i]);
         }
     }
 
@@ -44,8 +46,8 @@ public class Road {
      * 
      * @return
      */
-    public double width() {
-        return myWidth;
+    public double getWidth() {
+        return width;
     }
 
     /**
@@ -60,12 +62,12 @@ public class Road {
      * @param y3
      */
     public void addSegment(double x1, double y1, double x2, double y2, double x3, double y3) {
-        myPoints.add(x1);
-        myPoints.add(y1);
-        myPoints.add(x2);
-        myPoints.add(y2);
-        myPoints.add(x3);
-        myPoints.add(y3);        
+        points.add(x1);
+        points.add(y1);
+        points.add(x2);
+        points.add(y2);
+        points.add(x3);
+        points.add(y3);        
     }
     
     /**
@@ -74,7 +76,7 @@ public class Road {
      * @return
      */
     public int size() {
-        return myPoints.size() / 6;
+        return points.size() / 6;
     }
 
     /**
@@ -85,8 +87,8 @@ public class Road {
      */
     public double[] controlPoint(int i) {
         double[] p = new double[2];
-        p[0] = myPoints.get(i*2);
-        p[1] = myPoints.get(i*2+1);
+        p[0] = points.get(i*2);
+        p[1] = points.get(i*2+1);
         return p;
     }
     
@@ -103,14 +105,14 @@ public class Road {
         
         i *= 6;
         
-        double x0 = myPoints.get(i++);
-        double y0 = myPoints.get(i++);
-        double x1 = myPoints.get(i++);
-        double y1 = myPoints.get(i++);
-        double x2 = myPoints.get(i++);
-        double y2 = myPoints.get(i++);
-        double x3 = myPoints.get(i++);
-        double y3 = myPoints.get(i++);
+        double x0 = points.get(i++);
+        double y0 = points.get(i++);
+        double x1 = points.get(i++);
+        double y1 = points.get(i++);
+        double x2 = points.get(i++);
+        double y2 = points.get(i++);
+        double x3 = points.get(i++);
+        double y3 = points.get(i++);
         
         double[] p = new double[2];
 
@@ -155,11 +157,66 @@ public class Road {
      */
     public void display(GLAutoDrawable drawable) 
     {
-        // TODO
+        GL2 gl = drawable.getGL().getGL2();
+        double z_offset = 0.01;
+        double step_size = 0.1;
+//        for (double w = -(getWidth() / 2); w < getWidth() / 2; w += 0.1)
+        double[] startPoint = controlPoint(0);
+        double[] endPoint = controlPoint(3);
+        double[] middle = new double[2];
+        middle[0] = startPoint[0] + (endPoint[0] - startPoint[0]) / 2;
+        middle[1] = startPoint[1] + (endPoint[1] - startPoint[1]) / 2;
+        System.out.println(middle[0] + " " + middle[1]);
+        
+        for (double w = -getWidth() / 2; w < getWidth() / 2; w += 0.001)
+        {
+            gl.glPushMatrix();
+            gl.glTranslated(middle[0], middle[1], 0);
+            gl.glScaled(1 + w, 1 + w, 1);
+            gl.glTranslated(-middle[0], -middle[1], 0);
+            gl.glBegin(GL2.GL_LINE_STRIP);
+                {
+                    gl.glColor3f(1, 0, 1);
+                    for (double t = 0; t < this.size(); t += step_size)
+                    {
+                        double[] point = point(t);
+                        double z = z_offset + this.terrain.getAltitude(point[0], point[1]);
+                        gl.glVertex3d(point[0], point[1], z);
+                    }
+                }
+                gl.glEnd();
+            gl.glPopMatrix();
+        }
+        
+//        gl.glBegin(GL2.GL_QUAD_STRIP);
+//        {
+//            gl.glColor3d(1, 0, 1);
+//            for (double t = 0; t < this.size(); t += step_size)
+//            {
+//                double[] point = point(t);
+//                double z = z_offset + this.terrain.getAltitude(point[0], point[1]);
+//                gl.glVertex3d(point[0], point[1] + getWidth() / 2, z);
+//                gl.glVertex3d(point[0], point[1] - getWidth() / 2, z);
+//            }
+//        }
+//        gl.glEnd();
     }
 
-    public void init(GLAutoDrawable drawable) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * Make the road ready to be drawn in the first place
+     * @param drawable
+     */
+    public void init(GLAutoDrawable drawable)
+    {
+//        GL2 gl = drawable.getGL().getGL2();
+    }
+
+    /**
+     * Set the tearrin this road is located on
+     * @param terrain
+     */
+    public void setTerrain(Terrain terrain)
+    {
+        this.terrain = terrain;
     }
 }

@@ -47,6 +47,7 @@ public class Avatar
         rotation = new double[] { 0, 0 };
         position = new double[] { 0, 0, 0 };
         look = new double[] { 0, 5, 0 };
+        setZCoordinate();
         movementSpeed = BASE_MOVEMENT_SPEED;
         rotationSpeed = BASE_ROTATION_SPEED;
     }
@@ -63,7 +64,7 @@ public class Avatar
         {
             gl.glPushMatrix();
             {
-                gl.glColor3d(1, 0, 0);
+                gl.glColor3d(0.7, 0, 0.7);
                 gl.glTranslated(position[0], position[1], position[2]);
                 Game.glut.glutSolidCylinder(0.1, 1, 100, 10);
             }

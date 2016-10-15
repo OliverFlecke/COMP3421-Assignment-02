@@ -189,7 +189,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             }
         gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -(avatar.getPosition()[2] + 1));
         
-        drawCoordinateAxis(gl);
+//        drawCoordinateAxis(gl);
 
         setUpLighting(gl);
         this.avatar.display(drawable);
@@ -232,7 +232,8 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glEnable(GL2.GL_NORMALIZE);
         
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        
+//        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_DIFFUSE);
+//        gl.glEnable(GL2.GL_COLOR_MATERIAL);
         glu = new GLU();
         
         this.terrain.init(drawable);

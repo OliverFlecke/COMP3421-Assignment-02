@@ -120,7 +120,7 @@ public class LevelIO {
         JSONArray roads = new JSONArray();
         for (Road r : terrain.getRoads()) {
             JSONObject j = new JSONObject();
-            j.put("width", r.width());
+            j.put("width", r.getWidth());
             
             JSONArray spine = new JSONArray();
             int n = r.size();

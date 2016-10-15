@@ -90,8 +90,20 @@ public class Terrain {
      */
     public void setSunlightDir(float dx, float dy, float dz) {
         this.static_sunlight[0] = dx;
-        this.static_sunlight[1] = dy;
-        this.static_sunlight[2] = dz;        
+        this.static_sunlight[2] = dy;
+        this.static_sunlight[1] = dz;        
+    }
+    
+    /**
+     * Calculates the dynamic position of the sun 
+     */
+    private void calculateDynamicSunlightPosition()
+    {
+        double light_angle = light_step * (2 * Math.PI / light_slices);
+        dynamic_sunlight[0] = (float) (getSize().getWidth() / 2 + light_radius * Math.cos(light_angle));
+        dynamic_sunlight[1] = (float) (getSize().getHeight() / 2 + light_radius * Math.sin(light_angle));
+        dynamic_sunlight[2] = 5;
+        light_step++;
     }
     
     /**
@@ -259,7 +271,7 @@ public class Terrain {
         Game.glut.glutSolidSphere(1, 100, 100);
         gl.glTranslatef(-getSunlight()[0], -getSunlight()[1], -getSunlight()[2]);
         
-        for (Tree tree : this.trees) 
+        for (Tree tree : this.getTrees()) 
         {
             tree.display(drawable);
         }
@@ -268,18 +280,6 @@ public class Terrain {
         {
             road.display(drawable);
         }
-    }
-    
-    /**
-     * Calculates the dynamic position of the sun 
-     */
-    private void calculateDynamicSunlightPosition()
-    {
-        double light_angle = light_step * (2 * Math.PI / light_slices);
-        dynamic_sunlight[0] = (float) (getSize().getWidth() / 2 + light_radius * Math.cos(light_angle));
-        dynamic_sunlight[1] = (float) (getSize().getHeight() / 2 + light_radius * Math.sin(light_angle));
-        dynamic_sunlight[2] = 5;
-        light_step++;
     }
 
     public void init(GLAutoDrawable drawable)
@@ -297,6 +297,7 @@ public class Terrain {
         
         for (Road road : getRoads())
         {
+            road.setTerrain(this);
             road.init(drawable);
         }
     }
