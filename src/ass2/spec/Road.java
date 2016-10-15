@@ -13,6 +13,11 @@ import com.jogamp.opengl.GLAutoDrawable;
  */
 public class Road
 {
+//    private String textureFileName = "src/textures/road/tarmac.jpg";
+//    private String textureExt = ".jpg";
+    private String textureFileName = "src/textures/road/asphalt.png";
+    private String textureExt = ".png";
+    private Texture texture;
     private Terrain terrain;
     private List<Double> points;
     private double width;
@@ -159,47 +164,47 @@ public class Road
     {
         GL2 gl = drawable.getGL().getGL2();
         double z_offset = 0.01;
-        double step_size = 0.1;
-//        for (double w = -(getWidth() / 2); w < getWidth() / 2; w += 0.1)
-        double[] startPoint = controlPoint(0);
-        double[] endPoint = controlPoint(3);
-        double[] middle = new double[2];
-        middle[0] = startPoint[0] + (endPoint[0] - startPoint[0]) / 2;
-        middle[1] = startPoint[1] + (endPoint[1] - startPoint[1]) / 2;
-        System.out.println(middle[0] + " " + middle[1]);
-        
-        for (double w = -getWidth() / 2; w < getWidth() / 2; w += 0.001)
+        double step_size = 0.005;
+        gl.glBegin(GL2.GL_LINE_STRIP);
         {
-            gl.glPushMatrix();
-            gl.glTranslated(middle[0], middle[1], 0);
-            gl.glScaled(1 + w, 1 + w, 1);
-            gl.glTranslated(-middle[0], -middle[1], 0);
-            gl.glBegin(GL2.GL_LINE_STRIP);
-                {
-                    gl.glColor3f(1, 0, 1);
-                    for (double t = 0; t < this.size(); t += step_size)
-                    {
-                        double[] point = point(t);
-                        double z = z_offset + this.terrain.getAltitude(point[0], point[1]);
-                        gl.glVertex3d(point[0], point[1], z);
-                    }
-                }
-                gl.glEnd();
-            gl.glPopMatrix();
+            for (double t = 0; t < this.size(); t += step_size)
+            {
+                double[] point = point(t);
+                double z = z_offset + 1 + this.terrain.getAltitude(point[0], point[1]);
+                gl.glVertex3d(point[0], point[1], z);
+            }
         }
-        
-//        gl.glBegin(GL2.GL_QUAD_STRIP);
-//        {
-//            gl.glColor3d(1, 0, 1);
-//            for (double t = 0; t < this.size(); t += step_size)
-//            {
-//                double[] point = point(t);
-//                double z = z_offset + this.terrain.getAltitude(point[0], point[1]);
-//                gl.glVertex3d(point[0], point[1] + getWidth() / 2, z);
-//                gl.glVertex3d(point[0], point[1] - getWidth() / 2, z);
-//            }
-//        }
-//        gl.glEnd();
+        gl.glEnd();
+
+
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getTextureId());
+        gl.glBegin(GL2.GL_QUAD_STRIP);
+        {
+            double[] point = point(0);
+            double[] lastPoint = point;
+            for (double t = 0; t < this.size(); t += step_size)
+            {
+                point = point(t);
+                // Calculate the vector-prep between the last point and the current
+                double[] v = { -(lastPoint[1] - point[1]), lastPoint[0] - point[0] };
+                double length = Math.sqrt(Math.pow(v[0], 2) + Math.pow(v[1], 2));
+                v[0] = (v[0] / length) * (getWidth() / 2);
+                v[1] = (v[1] / length) * (getWidth() / 2);
+                
+                
+                double z0 = z_offset + this.terrain.getAltitude(point[0] - v[0], point[1] - v[1]);
+                double z1 = z_offset + this.terrain.getAltitude(point[0] + v[0], point[1] + v[1]);
+                gl.glNormal3d(0, 0, 1);
+                gl.glTexCoord2d(0, ((10 * t) % 10) / this.size());
+                gl.glVertex3d(point[0] - v[0], point[1] - v[1], z0);
+                gl.glNormal3d(0, 0, 1);
+                gl.glTexCoord2d(1, ((10 * t) % 10) / this.size());
+                gl.glVertex3d(point[0] + v[0], point[1] + v[1], z1);
+                
+                lastPoint = point;
+            }
+        }
+        gl.glEnd();
     }
 
     /**
@@ -208,7 +213,8 @@ public class Road
      */
     public void init(GLAutoDrawable drawable)
     {
-//        GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
+        texture = new Texture(gl, textureFileName, textureExt, true);
     }
 
     /**
