@@ -4,8 +4,6 @@ import java.util.Random;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.gl2.GLUT;
 
 /**
  * COMMENT: Comment Tree 
@@ -20,26 +18,27 @@ public class Tree
     private String textureExt = "jpg";
     private Texture texture;
     
-    private double height = 1;
-    private double[] myPos;
-    private double radius = 0.25;
+    private double[] position;
+    private double radius;
+    private double sphereRadius;
     private Terrain terrain;
     
     private int slices = 50;
     
     public Tree(double x, double y, double z) {
-        myPos = new double[3];
-        myPos[0] = x;
-        myPos[1] = z;
-        myPos[2] = height + random.nextDouble() * 2;
-//        System.out.println("Tree: ");
-//        System.out.println(myPos[0]);
-//        System.out.println(myPos[1]);
-//        System.out.println(myPos[2]);
+        this.position = new double[3];
+        this.position[0] = x;
+        this.position[1] = z;
+        this.position[2] = 1 + random.nextDouble() * 2;
+        this.radius = 0.1 + random.nextDouble() * 0.15;
+        this.sphereRadius = 0.5 + random.nextDouble() * 0.5;
     }
     
+    /**
+     * @return The position of the tree
+     */
     public double[] getPosition() {
-        return myPos;
+        return position;
     }
     
     /**
@@ -54,7 +53,7 @@ public class Tree
         double y = this.getPosition()[1];
         double z = this.getPosition()[2];
         double z_bottom = this.getTerrain().getAltitude(x, y);
-        double z_top = this.getTerrain().getAltitude(x, y) + z;
+        double z_top = z_bottom + z;
 
         // Draw a line to see were the center of the tree should be
         gl.glBegin(GL2.GL_LINES);
@@ -67,42 +66,9 @@ public class Tree
         
         // Push a matrix so you don't have to calculate the position
         gl.glPushMatrix();
-        gl.glTranslated(x, y, z_bottom);
+        gl.glTranslated(x, y, 0);
         
         gl.glPolygonMode(GL2.GL_BACK, GL2.GL_LINE);
-//        //Front circle
-//        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-//        {
-//             gl.glNormal3d(0, 0, -1);
-//             gl.glVertex3d(0, 0, z_bottom);
-//             double angleStep = 2*Math.PI / slices;
-//             for (int i = 0; i <= slices ; i++) {
-//                 double angle = i * angleStep;
-//                 double x_current = Math.cos(angle);
-//                 double y_current = Math.sin(angle);
-//
-//                gl.glVertex3d(radius * x_current, radius * y_current, 0);
-//             }
-//        }
-//        gl.glEnd();
-        
-//        // Back of the circle
-//        gl.glBegin(GL2.GL_TRIANGLE_FAN);
-//        {
-//            gl.glNormal3d(0, 0, -1);
-//            gl.glVertex3d(0, 0, z_top);
-//            double angleStep = 2*Math.PI / slices;
-//            for (int i = slices; i >= 0; i--)
-//            {
-//                double angle = 2*Math.PI - i * angleStep;
-//                double x_current = Math.cos(angle);
-//                double y_current = Math.sin(angle);
-//                
-//                gl.glVertex3d(radius * x_current, radius * y_current, z);
-//            }
-//        }
-//        gl.glEnd();
-        
         // Side of the cylinder
         // Load the texture
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getTextureId());
@@ -118,9 +84,9 @@ public class Tree
                 
                 gl.glNormal3d(x_current, y_current, 0);
                 gl.glTexCoord2d(tex_coord, 1);
-                gl.glVertex3d(radius * x_current, radius * y_current, z);
+                gl.glVertex3d(radius * x_current, radius * y_current, z_top);
                 gl.glTexCoord2d(tex_coord, 0);
-                gl.glVertex3d(radius * x_current, radius * y_current, 0);
+                gl.glVertex3d(radius * x_current, radius * y_current, this.getTerrain().getAltitude(x + radius * x_current, y + radius * y_current));
             }
         }
         gl.glEnd();
@@ -128,9 +94,8 @@ public class Tree
         
         gl.glPushMatrix();
             gl.glColor4d(1, 0, 0, 1);
-            gl.glTranslated(0, 0, z + 0.9);
-            GLUT glut = new GLUT();
-            glut.glutSolidSphere(1, 40, 40);
+            gl.glTranslated(0, 0, z_top + 0.9 * sphereRadius);
+            Game.glut.glutSolidSphere(sphereRadius, 40, 40);
         gl.glPopMatrix();
         
         gl.glPopMatrix();

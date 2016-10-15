@@ -45,7 +45,7 @@ public class Avatar
     public void reset()
     {
         rotation = new double[] { 0, 0 };
-        position = new double[] { 0, 0, 0 };
+        position = new double[] { 0, 0, 3 };
         look = new double[] { 0, 5, 0 };
         movementSpeed = BASE_MOVEMENT_SPEED;
         rotationSpeed = BASE_ROTATION_SPEED;
