@@ -2,7 +2,6 @@ package ass2.spec;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.util.gl2.GLUT;
 
 /**
  * An avatar, representing the player in the game. 
@@ -20,8 +19,6 @@ public class Avatar
     private final double SPRINT_ROTATION_SPEED = 5;
     private final double BASE_ROTATION_SPEED = 1;
     
-    private GLUT glu = new GLUT();
-    
     private double[] position;
     private double[] rotation;
     private double[] look;
@@ -31,11 +28,14 @@ public class Avatar
     
     private ViewMode viewMode = ViewMode.FIRST_PERSON;
     
+    private Terrain terrain;
+    
     /**
      * Create an avatar 
      */
-    public Avatar()
+    public Avatar(Terrain terrain)
     {
+        this.terrain = terrain;
         reset();
     }
     
@@ -45,7 +45,7 @@ public class Avatar
     public void reset()
     {
         rotation = new double[] { 0, 0 };
-        position = new double[] { 0, 0, 3 };
+        position = new double[] { 0, 0, 0 };
         look = new double[] { 0, 5, 0 };
         movementSpeed = BASE_MOVEMENT_SPEED;
         rotationSpeed = BASE_ROTATION_SPEED;
@@ -65,7 +65,7 @@ public class Avatar
             {
                 gl.glColor3d(1, 0, 0);
                 gl.glTranslated(position[0], position[1], position[2]);
-                glu.glutSolidCylinder(0.1, 1, 100, 10);
+                Game.glut.glutSolidCylinder(0.1, 1, 100, 10);
             }
             gl.glPopMatrix();
         }
@@ -100,6 +100,11 @@ public class Avatar
         rotationSpeed = BASE_ROTATION_SPEED;
     }
     
+    public void setZCoordinate()
+    {
+        position[2] = this.terrain.getAltitude(position[0], position[1]);
+    }
+    
     /**
      * Move the avatar to the right
      */
@@ -107,6 +112,7 @@ public class Avatar
     {
         position[0] += movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
         position[1] += movementSpeed * (-Math.sin(rotation[0] / 180 * Math.PI));
+        setZCoordinate();
     }
     
     /**
@@ -116,6 +122,7 @@ public class Avatar
     {
         position[0] -= movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
         position[1] -= movementSpeed * (-Math.sin(rotation[0] / 180 * Math.PI));
+        setZCoordinate();
     }
     
     /**
@@ -125,6 +132,7 @@ public class Avatar
     {
         position[1] += movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
         position[0] += movementSpeed * Math.sin(rotation[0] / 180 * Math.PI);
+        setZCoordinate();
     }
     
     /**
@@ -134,6 +142,7 @@ public class Avatar
     {
         position[1] -= movementSpeed * Math.cos(rotation[0] / 180 * Math.PI);
         position[0] -= movementSpeed * Math.sin(rotation[0] / 180 * Math.PI);
+        setZCoordinate();
     }
     
     /**

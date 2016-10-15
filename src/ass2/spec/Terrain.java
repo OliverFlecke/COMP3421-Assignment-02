@@ -141,15 +141,19 @@ public class Terrain {
      * TO BE COMPLETED - Should be completed
      * 
      * @param x
-     * @param z
+     * @param y
      * @return
      */
-    public double getAltitude(double x, double z)
+    public double getAltitude(double x, double y)
     {
+        if (x < 0 || x >= this.getSize().getWidth() || y < 0 || y >= this.getSize().getHeight())
+        {
+            return 0;
+        }
         double x_ratio = x % 1;
-        double y_ratio = z % 1;
+        double y_ratio = y % 1;
         int x0 = (int) Math.floor(x);
-        int y0 = (int) Math.floor(z);
+        int y0 = (int) Math.floor(y);
         int x1 = x0;
         int y1 = y0;
         if (x0 < this.getSize().getWidth() - 1) x1 = x0 + 1;

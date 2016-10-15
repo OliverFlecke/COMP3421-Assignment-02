@@ -221,7 +221,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     @Override
     public void init(GLAutoDrawable drawable)
     {
-        avatar = new Avatar();
+        avatar = new Avatar(this.terrain);
         GL2 gl = drawable.getGL().getGL2();
         gl.glClearColor(0.2f, 0.2f, 1f, 1f);
         // Makes sure that the objects are drawn in the right order
