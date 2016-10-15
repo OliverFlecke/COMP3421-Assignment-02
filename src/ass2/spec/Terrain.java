@@ -138,16 +138,27 @@ public class Terrain {
      * Get the altitude at an arbitrary point. 
      * Non-integer points should be interpolated from neighbouring grid points
      * 
-     * TO BE COMPLETED
+     * TO BE COMPLETED - Should be completed
      * 
      * @param x
      * @param z
      * @return
      */
-    public double getAltitude(double x, double z) {
-        double altitude = 0;
-        altitude = this.altitude[(int) x][(int) z];
-        return altitude;
+    public double getAltitude(double x, double z)
+    {
+        double x_ratio = x % 1;
+        double y_ratio = z % 1;
+        int x0 = (int) Math.floor(x);
+        int y0 = (int) Math.floor(z);
+        int x1 = x0;
+        int y1 = y0;
+        if (x0 < this.getSize().getWidth() - 1) x1 = x0 + 1;
+        if (y0 < this.getSize().getHeight() - 1) y1 = y0 + 1;
+        
+        // Interpolation along the x-axis
+        double alt0 = ((1 - x_ratio) * this.altitude[x0][y0]) + (x_ratio * this.altitude[x1][y0]);
+        double alt1 = ((1 - x_ratio) * this.altitude[x0][y1]) + (x_ratio * this.altitude[x1][y1]);
+        return ((1 - y_ratio) * alt0) + (y_ratio * alt1);
     }
 
     /**
