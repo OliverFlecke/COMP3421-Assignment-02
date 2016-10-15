@@ -20,8 +20,6 @@ public class Tree
     private String textureExtLeaf = "jpg";
     private Texture treeTexture;
     private Texture leafTexture;
-//    private final int TREE_TEXTURE = 0;
-//    private final int LEAF_TEXTURE = 1;
     
     private double[] position;
     private double radius;
