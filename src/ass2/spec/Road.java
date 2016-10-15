@@ -165,16 +165,17 @@ public class Road
         GL2 gl = drawable.getGL().getGL2();
         double z_offset = 0.01;
         double step_size = 0.005;
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        {
-            for (double t = 0; t < this.size(); t += step_size)
-            {
-                double[] point = point(t);
-                double z = z_offset + 1 + this.terrain.getAltitude(point[0], point[1]);
-                gl.glVertex3d(point[0], point[1], z);
-            }
-        }
-        gl.glEnd();
+        // Used to show a line above where the road should be
+//        gl.glBegin(GL2.GL_LINE_STRIP);
+//        {
+//            for (double t = 0; t < this.size(); t += step_size)
+//            {
+//                double[] point = point(t);
+//                double z = z_offset + 1 + this.terrain.getAltitude(point[0], point[1]);
+//                gl.glVertex3d(point[0], point[1], z);
+//            }
+//        }
+//        gl.glEnd();
 
 
         gl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getTextureId());
