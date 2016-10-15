@@ -168,26 +168,29 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	    }
 	    
 	    
-	    // Rotate the world around the player
-	    gl.glTranslated(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1);
-            // Rotate around the z axis
-            gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
-            // Rotate up and down - The x and y axis need to be calculated
-            double ratio = rotation_ration(avatar.getRotation()[0]);
-            double angle = avatar.getRotation()[1];
-            if (avatar.getRotation()[0] > 90 && avatar.getRotation()[0] <= 270)
-            {
-                angle = -angle;
-            }
-            if (ratio > 0)
-            {
-                gl.glRotated(angle, ratio, 1.0 - ratio, 0);
-            }
-            else 
-            {
-                gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
-            }
-        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -(avatar.getPosition()[2] + 1));
+	    if (avatar.getViewMode() != ViewMode.SUN)
+	    {
+	        // Rotate the world around the player
+	        gl.glTranslated(avatar.getPosition()[0], avatar.getPosition()[1], avatar.getPosition()[2] + 1);
+	        // Rotate around the z axis
+	        gl.glRotated(avatar.getRotation()[0], 0, 0, 1);
+	        // Rotate up and down - The x and y axis need to be calculated
+	        double ratio = rotation_ration(avatar.getRotation()[0]);
+	        double angle = avatar.getRotation()[1];
+	        if (avatar.getRotation()[0] > 90 && avatar.getRotation()[0] <= 270)
+	        {
+	            angle = -angle;
+	        }
+	        if (ratio > 0)
+	        {
+	            gl.glRotated(angle, ratio, 1.0 - ratio, 0);
+	        }
+	        else 
+	        {
+	            gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
+	        }
+	        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -(avatar.getPosition()[2] + 1));
+	    }
         
 //        drawCoordinateAxis(gl);
 
