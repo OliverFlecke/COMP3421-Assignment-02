@@ -30,7 +30,6 @@ import com.jogamp.opengl.util.gl2.GLUT;
 public class Game extends JFrame implements GLEventListener, KeyListener, MouseMotionListener 
 {
     private static final long serialVersionUID = -3503485707097285491L;
-    public static GLUT glut = new GLUT();
     
     private final int RIGHT_KEY = 0,
             LEFT_KEY    = 1,
@@ -42,13 +41,14 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             LOOK_RIGHT  = 7;
     private boolean[] keysBeingPressed = new boolean[8];
     
+    boolean fog = false;
     // Mouse variables
     private double mouseRotationFactor = 25;
     private int mouseLastX = 0, mouseLastY = 0;
     private long mouseLastTime = 0;
     private Robot mouseMover; // Class used to move the mouse to the center of the screen
-    
     private GLU glu;
+    public static GLUT glut = new GLUT();
     
     private Terrain terrain;
     public static Avatar avatar;
@@ -223,8 +223,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     @Override
     public void dispose(GLAutoDrawable drawable) {}
 
-    boolean fog = false;
-
     @Override
     public void init(GLAutoDrawable drawable)
     {
@@ -266,6 +264,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         
         this.terrain.init(drawable);
     }
+
+    @Override
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
     
     /**
      * Setup the light properly.
@@ -290,9 +291,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
     }
 
-	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
-    
     @Override
     public void keyPressed(KeyEvent e) 
     {
@@ -312,7 +310,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
                 terrain.sun.switchDay();
                 break;
             case KeyEvent.VK_C:
-                terrain.switchRain();
+                terrain.rain.switchRain();
                 break;
             case KeyEvent.VK_F:
                 fog = !fog;

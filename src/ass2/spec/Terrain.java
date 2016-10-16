@@ -7,10 +7,7 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
-
-
 /**
- * COMMENT: Comment HeightMap 
  *
  * @author Oliver Fleckenstein
  */
@@ -27,12 +24,7 @@ public class Terrain
     private List<Road> roads;
     private Texture[] textures;
     public Sun sun;
-
-    private static final int MAX_PARTICLES = 1000;
-    public static final int LIGHT_RAIN = 200;
-    public static final int HEAVY_RAIN = 750;
-    private Particle[] particles = new Particle[MAX_PARTICLES];
-    private boolean isRaining = false;
+    public Rain rain;
     /**
      * Create a new terrain
      *
@@ -45,6 +37,7 @@ public class Terrain
         this.trees = new ArrayList<Tree>();
         this.roads = new ArrayList<Road>();
         sun = new Sun(this);
+        rain = new Rain(this);
     }
     
     public Terrain(Dimension size) {
@@ -180,7 +173,7 @@ public class Terrain
         
         sun.drawSun(gl);
         
-        if (isRaining) { rain(gl); }
+        if (rain.isRaining()) { rain.run(gl); }
         
         drawTerrain(gl);
     }
@@ -235,6 +228,10 @@ public class Terrain
         gl.glPopMatrix();
     }
 
+    /**
+     * Setup all components and sub-component so they are ready to be drawn
+     * @param drawable
+     */
     public void init(GLAutoDrawable drawable)
     {
         GL2 gl = drawable.getGL().getGL2();
@@ -243,8 +240,7 @@ public class Terrain
         
         textures = new Texture[1];
         textures[0] = new Texture(gl, terrainTextureFileName, terrainTextureExt, true);
-        Particle.texture = new Texture(gl, Particle.textureFileName, Particle.textureExt, false);
-        
+
         sun.init(drawable);
         
         for (Tree tree : getTrees()) 
@@ -259,70 +255,6 @@ public class Terrain
             road.init(drawable);
         }
         
-        for (int i = 0; i < particles.length; i++) 
-        {
-            particles[i] = new Particle();
-        }
-    }
-    
-    /**
-     * Make it rain!
-     * @param gl
-     */
-    public void rain(GL2 gl)
-    {
-        gl.glPushMatrix();
-        gl.glTranslated(Game.avatar.getPosition()[0], Game.avatar.getPosition()[1], Game.avatar.getPosition()[2]);
-        gl.glRotated(-Game.avatar.getRotation()[0], 0, 0, 1);
-        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
-        
-        float matAmbAndDifL[] = {0.0f, 0.0f, 1.0f, 0.5f};
-        float matSpecL[] = { 0.0f, 0.0f, 1.0f, 0.5f };
-        float matShineL[] = { 200.0f };
-        
-        // Material properties of sphere.
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDifL,0);
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpecL,0);
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShineL,0);
-
-        // Bind texture
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, Particle.texture.getTextureId());
-        float size_x = 0.001f;
-        float size_z = 0.02f;
-        
-        for (int i = 0; i < particles.length; i++)
-        {
-            if (particles[i].active)
-            {
-                gl.glBegin(GL2.GL_QUADS);
-                {
-                    float px = particles[i].x;
-                    float py = particles[i].y;
-                    float pz = particles[i].z;
-
-                    gl.glTexCoord2d(1, 1);
-                    gl.glVertex3f(px + size_x, py, pz + size_z); // Top Right
-                    gl.glTexCoord2d(0, 1);
-                    gl.glVertex3f(px - size_x, py, pz + size_z); // Top Left
-                    gl.glTexCoord2d(0, 0);
-                    gl.glVertex3f(px - size_x, py, pz - size_z); // Bottom Left
-                    gl.glTexCoord2d(1, 0);
-                    gl.glVertex3f(px + size_x, py, pz - size_z); // Bottom Right
-                }
-                gl.glEnd();
-                
-                particles[i].move();
-            }
-        }
-        gl.glPopAttrib();
-        gl.glPopMatrix();
-    }
-    
-    /**
-     * Switch the rain on and off
-     */
-    public void switchRain()
-    {
-        this.isRaining = !this.isRaining;
+        rain.init(drawable);
     }
 }
