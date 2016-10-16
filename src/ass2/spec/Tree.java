@@ -6,7 +6,8 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
 /**
- * COMMENT: Comment Tree 
+ * Representing a tree. Can draw tree with texture at a given
+ * position
  *
  * @author malcolmr
  */
@@ -59,17 +60,29 @@ public class Tree
         double z_top = z_bottom + z;
 
         // Draw a line to see were the center of the tree should be
-        gl.glBegin(GL2.GL_LINES);
-        {
-            gl.glColor3f(1, 1, 1);
-            gl.glVertex3d(x, y, z_bottom);
-            gl.glVertex3d(x, y, z_top);
-        }
-        gl.glEnd();
+//        gl.glBegin(GL2.GL_LINES);
+//        {
+//            gl.glColor3f(1, 1, 1);
+//            gl.glVertex3d(x, y, z_bottom);
+//            gl.glVertex3d(x, y, z_top);
+//        }
+//        gl.glEnd();
         
         // Push a matrix so you don't have to calculate the position
         gl.glPushMatrix();
         gl.glTranslated(x, y, 0);
+        
+        float emmL[] = {0.0f, 0.0f, 0.0f, 1.0f};
+        float matAmbAndDifL[] = {0.25f, 0.5f, 0.25f, 0.5f};
+        float matSpecL[] = { 0.2f, 0.5f, 0.2f, 1.0f };
+        float matShineL[] = { 50.0f };
+
+        // Material properties of sphere.
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDifL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpecL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShineL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emmL,0);
+        
         
         gl.glPolygonMode(GL2.GL_BACK, GL2.GL_LINE);
         // Side of the cylinder
