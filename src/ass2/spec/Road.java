@@ -195,10 +195,10 @@ public class Road
                 
                 double z0 = z_offset + this.terrain.getAltitude(point[0] - v[0], point[1] - v[1]);
                 double z1 = z_offset + this.terrain.getAltitude(point[0] + v[0], point[1] + v[1]);
-                gl.glNormal3d(0, 0, 1);
+//                gl.glNormal3d(0, 0, 1);
                 gl.glTexCoord2d(0, ((10 * t) % 10) / this.size());
                 gl.glVertex3d(point[0] - v[0], point[1] - v[1], z0);
-                gl.glNormal3d(0, 0, 1);
+//                gl.glNormal3d(0, 0, 1);
                 gl.glTexCoord2d(1, ((10 * t) % 10) / this.size());
                 gl.glVertex3d(point[0] + v[0], point[1] + v[1], z1);
                 
