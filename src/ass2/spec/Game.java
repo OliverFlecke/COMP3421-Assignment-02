@@ -130,7 +130,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	public void display(GLAutoDrawable drawable) 
 	{
 	    GL2 gl = drawable.getGL().getGL2();
-        if (terrain.isDay()) 
+        if (terrain.sun.isDay()) 
             gl.glClearColor(0f, 0f, 1f, 1f);
         else
             gl.glClearColor(0f, 0f, 0f, 0f);
@@ -175,7 +175,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	    }
 	    else if (avatar.getViewMode() == ViewMode.SUN)
 	    {
-	        glu.gluLookAt(terrain.getSunlight()[0], terrain.getSunlight()[1], terrain.getSunlight()[2], 
+	        glu.gluLookAt(terrain.sun.getPosition()[0], terrain.sun.getPosition()[1], terrain.sun.getPosition()[2], 
 	                terrain.getSize().getWidth() / 2, terrain.getSize().getHeight() / 2, 0, 
 	                0, 0, 1);
 	    }
@@ -284,7 +284,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, terrain.getSunlight(), 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, terrain.sun.getPosition(), 0);
         
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
         gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
@@ -306,13 +306,13 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
                 break;
             // Switch dynamic lightning on/off
             case KeyEvent.VK_L:
-                terrain.switchLightning();
+                terrain.sun.switchLightning();
+                break;
+            case KeyEvent.VK_D:
+                terrain.sun.switchDay();
                 break;
             case KeyEvent.VK_C:
                 terrain.switchRain();
-                break;
-            case KeyEvent.VK_D:
-                terrain.switchDay();
                 break;
             case KeyEvent.VK_F:
                 fog = !fog;

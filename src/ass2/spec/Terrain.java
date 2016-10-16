@@ -20,26 +20,18 @@ public class Terrain
     // Textures
     private String terrainTextureFileName = "src/textures/terrain/tileable_grass_00.png";
     private String terrainTextureExt = "png";
-    private String sunTextureFileName = "src/textures/sun/black-and-yellow.jpg";
-    private String sunTextureExt = "jpg";
     
     private Dimension size;
     private double[][] altitude;
     private List<Tree> trees;
     private List<Road> roads;
     private Texture[] textures;
-    
-    // Variables for lightning
-    private float[] dynamic_sunlight;
-    private int light_slices = 250;
-    private int light_step = 0;
-    private float light_radius = 10f;
-    private float[] static_sunlight;
-    private boolean dynamic_lightning = true;
+    public Sun sun;
 
     private static final int MAX_PARTICLES = 1000;
+    public static final int LIGHT_RAIN = 200;
+    public static final int HEAVY_RAIN = 750;
     private Particle[] particles = new Particle[MAX_PARTICLES];
-    private boolean isDay = true;
     private boolean isRaining = false;
     /**
      * Create a new terrain
@@ -52,8 +44,7 @@ public class Terrain
         this.altitude = new double[width][depth];
         this.trees = new ArrayList<Tree>();
         this.roads = new ArrayList<Road>();
-        this.static_sunlight = new float[3];
-        this.dynamic_sunlight = new float[3];
+        sun = new Sun(this);
     }
     
     public Terrain(Dimension size) {
@@ -70,47 +61,6 @@ public class Terrain
 
     public List<Road> getRoads() {
         return this.roads;
-    }
-
-    /**
-     * @return The current position of the sun
-     */
-    public float[] getSunlight() {
-        if (dynamic_lightning)
-        {
-            return this.dynamic_sunlight;
-        }
-        else 
-        {
-            return this.static_sunlight;
-        }
-    }
-
-    /**
-     * Set the sunlight direction. 
-     * 
-     * Note: the sun should be treated as a directional light, without a position
-     * 
-     * @param dx
-     * @param dy
-     * @param dz
-     */
-    public void setSunlightDir(float dx, float dy, float dz) {
-        this.static_sunlight[0] = dx;
-        this.static_sunlight[2] = dy;
-        this.static_sunlight[1] = dz;        
-    }
-    
-    /**
-     * Calculates the dynamic position of the sun 
-     */
-    private void calculateDynamicSunlightPosition()
-    {
-        double light_angle = light_step * (2 * Math.PI / light_slices);
-        dynamic_sunlight[0] = (float) (getSize().getWidth() / 2 + light_radius * Math.cos(light_angle));
-        dynamic_sunlight[1] = (float) (getSize().getHeight() / 2 + light_radius * Math.sin(light_angle));
-        dynamic_sunlight[2] = 5;
-        light_step++;
     }
     
     /**
@@ -228,7 +178,7 @@ public class Terrain
             road.display(drawable);
         }
         
-        drawSun(gl);
+        sun.drawSun(gl);
         
         if (isRaining) { rain(gl); }
         
@@ -291,10 +241,11 @@ public class Terrain
         
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
         
-        textures = new Texture[2];
+        textures = new Texture[1];
         textures[0] = new Texture(gl, terrainTextureFileName, terrainTextureExt, true);
-        textures[1] = new Texture(gl, sunTextureFileName, sunTextureExt, true);
         Particle.texture = new Texture(gl, Particle.textureFileName, Particle.textureExt, false);
+        
+        sun.init(drawable);
         
         for (Tree tree : getTrees()) 
         {
@@ -313,33 +264,6 @@ public class Terrain
             particles[i] = new Particle();
         }
     }
-    
-    /**
-     * Draw the sun
-     * @param gl
-     */
-    private void drawSun(GL2 gl)
-    {
-        calculateDynamicSunlightPosition();
-        gl.glPushMatrix();
-        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
-            gl.glTranslatef(getSunlight()[0], getSunlight()[1], getSunlight()[2]);
-            float[] matAmbAndDif = new float[] {1f, 0.2f, 0.0f, 1.0f};
-            float[] matSpec = new float[] { 0.2f, 0.2f, 0.0f, 1.0f };
-            float[] matShine = new float[] { 10.0f };
-            float[] emm = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
-            
-            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
-            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpec,0);
-            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShine,0);
-            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
-            
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[1].getTextureId());
-            Game.glut.glutSolidSphere(1, 100, 100);
-        gl.glPopAttrib();
-        gl.glPopMatrix();
-    }
-    
     
     /**
      * Make it rain!
@@ -395,35 +319,10 @@ public class Terrain
     }
     
     /**
-     * Switch the lightning between dynamic and static
-     */
-    public void switchLightning() 
-    {
-        this.dynamic_lightning = !this.dynamic_lightning;
-    }
-    
-    /**
      * Switch the rain on and off
      */
     public void switchRain()
     {
         this.isRaining = !this.isRaining;
     }
-    
-    /**
-     * Switch between day and night mode
-     */
-    public void switchDay()
-    {
-        this.isDay = !this.isDay;
-    }
-
-    /**
-     * @return True if it is day time
-     */
-    public boolean isDay() 
-    {
-        return this.isDay;
-    }
-    
 }

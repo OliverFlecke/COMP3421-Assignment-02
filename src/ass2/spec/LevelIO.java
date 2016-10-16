@@ -40,7 +40,7 @@ public class LevelIO {
         float dx = (float)jsonSun.getDouble(0);
         float dy = (float)jsonSun.getDouble(1);
         float dz = (float)jsonSun.getDouble(2);
-        terrain.setSunlightDir(dx, dy, dz);
+        terrain.sun.setPosition(dx, dy, dz);
        
         JSONArray jsonAltitude = jsonTerrain.getJSONArray("altitude");
         for (int i = 0; i < jsonAltitude.length(); i++) {
@@ -93,7 +93,7 @@ public class LevelIO {
         json.put("depth", size.height);
 
         JSONArray jsonSun = new JSONArray();
-        float[] sunlight = terrain.getSunlight();
+        float[] sunlight = terrain.sun.getPosition();
         jsonSun.put(sunlight[0]);
         jsonSun.put(sunlight[1]);
         jsonSun.put(sunlight[2]);
