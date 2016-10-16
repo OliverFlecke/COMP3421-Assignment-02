@@ -51,7 +51,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     private GLU glu;
     
     private Terrain terrain;
-    private Avatar avatar;
+    public static Avatar avatar;
     
     /**
      * Create a game with a terrain
@@ -127,16 +127,29 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     }
     
 	@Override
-	public void display(GLAutoDrawable drawable) {
+	public void display(GLAutoDrawable drawable) 
+	{
 	    GL2 gl = drawable.getGL().getGL2();
-	    gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-	    // Disabled by default
-	    // To turn on culling:
-	    gl.glEnable(GL2.GL_CULL_FACE);
-	    gl.glCullFace(GL2.GL_BACK);
-	    
+        if (terrain.isDay()) 
+            gl.glClearColor(0f, 0f, 1f, 1f);
+        else
+            gl.glClearColor(0f, 0f, 0f, 0f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);	    
         
+        setupCamera(gl);
+        
+//        drawCoordinateAxis(gl);
+
+        setUpLighting(gl);
+        avatar.display(drawable);
+        this.terrain.display(drawable);
+    }
+
+	/**
+	 * Setup the camera for the scene
+	 * @param gl
+	 */
+    protected void setupCamera(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
 	    gl.glLoadIdentity();
 	    
@@ -167,7 +180,7 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	                0, 0, 1);
 	    }
 	    
-	    
+	    // Rotate camera 
 	    if (avatar.getViewMode() != ViewMode.SUN)
 	    {
 	        // Rotate the world around the player
@@ -178,25 +191,14 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	        double ratio = rotation_ration(avatar.getRotation()[0]);
 	        double angle = avatar.getRotation()[1];
 	        if (avatar.getRotation()[0] > 90 && avatar.getRotation()[0] <= 270)
-	        {
 	            angle = -angle;
-	        }
-	        if (ratio > 0)
-	        {
-	            gl.glRotated(angle, ratio, 1.0 - ratio, 0);
-	        }
-	        else 
-	        {
-	            gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
-	        }
+	        
+	        if (ratio > 0) gl.glRotated(angle, ratio, 1.0 - ratio, 0);
+	        else gl.glRotated(-angle, ratio, 1.0 - Math.abs(ratio), 0);
+	        
+	        // Undo translation as: Can't push/pop as this will undo rotation!
 	        gl.glTranslated(-avatar.getPosition()[0], -avatar.getPosition()[1], -(avatar.getPosition()[2] + 1));
 	    }
-        
-//        drawCoordinateAxis(gl);
-
-        setUpLighting(gl);
-        this.avatar.display(drawable);
-        this.terrain.display(drawable);
     }
 
     protected void drawCoordinateAxis(GL2 gl) {
@@ -221,22 +223,45 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     @Override
     public void dispose(GLAutoDrawable drawable) {}
 
+    boolean fog = false;
+
     @Override
     public void init(GLAutoDrawable drawable)
     {
         avatar = new Avatar(this.terrain);
         GL2 gl = drawable.getGL().getGL2();
-        gl.glClearColor(0.2f, 0.2f, 1f, 1f);
+        gl.glClearColor(0f, 0f, 1f, 1f);
+
+        // Fog
+        if (fog)
+        {
+            gl.glEnable(GL2.GL_FOG);
+            gl.glHint(GL2.GL_FOG_HINT, GL2.GL_NICEST);
+            float[] fog_color = { 1f, 1f, 1f, 0.5f };
+            gl.glFogfv(GL2.GL_FOG_COLOR, fog_color, 1);
+            gl.glFogf(GL2.GL_FOG_START, 2f);
+            gl.glFogf(GL2.GL_FOG_END, 4f);
+            gl.glFogi(GL2.GL_FOG_MODE, GL2.GL_LINEAR);
+        }
+        
+        
         // Makes sure that the objects are drawn in the right order
         gl.glEnable(GL2.GL_DEPTH_TEST);
+        // To turn on culling:
+        gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glCullFace(GL2.GL_BACK);
+        gl.glEnable( GL2.GL_POLYGON_OFFSET_FILL);
+        gl.glEnable(GL2.GL_BLEND); 
         // enable lighting
         gl.glEnable(GL2.GL_LIGHTING);
         gl.glEnable(GL2.GL_LIGHT0);
-        gl.glEnable(GL2.GL_NORMALIZE);
+//        gl.glEnable(GL2.GL_NORMALIZE);
         
-        gl.glEnable(GL2.GL_TEXTURE_2D);
 //        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_DIFFUSE);
 //        gl.glEnable(GL2.GL_COLOR_MATERIAL);
+
+        
+        gl.glEnable(GL2.GL_TEXTURE_2D);
         glu = new GLU();
         
         this.terrain.init(drawable);
@@ -272,6 +297,36 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     public void keyPressed(KeyEvent e) 
     {
         int key = e.getKeyCode();
+        
+        switch (e.getKeyCode())
+        {
+            // Reset variables
+            case KeyEvent.VK_R:
+                avatar.reset();
+                break;
+            // Switch dynamic lightning on/off
+            case KeyEvent.VK_L:
+                terrain.switchLightning();
+                break;
+            case KeyEvent.VK_C:
+                terrain.switchRain();
+                break;
+            case KeyEvent.VK_D:
+                terrain.switchDay();
+                break;
+            case KeyEvent.VK_F:
+                fog = !fog;
+                break;
+                
+            case KeyEvent.VK_SHIFT:
+                avatar.startSprinting();
+                break;
+            case KeyEvent.VK_V:
+                avatar.switchViewMode();
+                break;
+            default:
+                break;
+        }
         
         // Move the camera around with the arrow keys
         if (key == KeyEvent.VK_RIGHT || keysBeingPressed[RIGHT_KEY])
@@ -315,28 +370,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         {
             keysBeingPressed[LOOK_LEFT] = true;
             avatar.lookLeft();
-        }
-        
-        
-        
-        switch (e.getKeyCode())
-        {
-            // Reset variables
-            case KeyEvent.VK_R:
-                avatar.reset();
-                break;
-            // Switch dynamic lightning on/off
-            case KeyEvent.VK_L:
-                terrain.switchLightning();
-                break;
-            case KeyEvent.VK_SHIFT:
-                avatar.startSprinting();
-                break;
-            case KeyEvent.VK_V:
-                avatar.switchViewMode();
-                break;
-            default:
-                break;
         }
     }
     

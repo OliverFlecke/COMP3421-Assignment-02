@@ -14,11 +14,14 @@ import com.jogamp.opengl.GLAutoDrawable;
  *
  * @author Oliver Fleckenstein
  */
-public class Terrain {
+public class Terrain
+{
     
     // Textures
-    private String textureFileName1 = "src/textures/terrain/tileable_grass_00.png";
-    private String textureExt1 = "png";
+    private String terrainTextureFileName = "src/textures/terrain/tileable_grass_00.png";
+    private String terrainTextureExt = "png";
+    private String sunTextureFileName = "src/textures/sun/black-and-yellow.jpg";
+    private String sunTextureExt = "jpg";
     
     private Dimension size;
     private double[][] altitude;
@@ -34,6 +37,10 @@ public class Terrain {
     private float[] static_sunlight;
     private boolean dynamic_lightning = true;
 
+    private static final int MAX_PARTICLES = 1000;
+    private Particle[] particles = new Particle[MAX_PARTICLES];
+    private boolean isDay = true;
+    private boolean isRaining = false;
     /**
      * Create a new terrain
      *
@@ -208,26 +215,42 @@ public class Terrain {
      */
     public void display(GLAutoDrawable drawable) 
     {
-        calculateDynamicSunlightPosition();
         GL2 gl = drawable.getGL().getGL2();
         
+        // Draw trees and roads
+        for (Tree tree : this.getTrees()) 
+        {
+            tree.display(drawable);
+        }
+        
+        for (Road road : this.getRoads())
+        {
+            road.display(drawable);
+        }
+        
+        drawSun(gl);
+        
+        if (isRaining) { rain(gl); }
+        
+        drawTerrain(gl);
+    }
+
+    private void drawTerrain(GL2 gl) {
+        gl.glPushMatrix();
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
+        float matAmbAndDif[] = {0.5f, 0.75f, 0.5f, 0.5f};
+        
+        // Material properties of teapot
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
+     
         // Load the texture
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[0].getTextureId());
-        
         // Draw the terrain
         for (int x = 0; x < size.getHeight() - 1; x++) {
             for (int y = 0; y < size.getWidth() - 1; y++) {
                 double[] v1 = MathHelper.getVector(x, y, this.getAltitude(x, y), x + 1, y, this.getAltitude(x + 1, y));
                 double[] v2 = MathHelper.getVector(x, y, this.getAltitude(x, y), x, y + 1, this.getAltitude(x, y + 1));
                 double[] normal = MathHelper.crossProduct(v1, v2);
-//                System.out.println("First normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
-//                gl.glBegin(GL2.GL_LINES);
-//                {
-//                    gl.glVertex3d(x, y, this.getAltitude(x, y));
-//                    gl.glVertex3d(x + normal[0], y + normal[1], this.getAltitude(x, y) + normal[2]);
-//                }
-//                gl.glEnd();
-                
                 
                 gl.glBegin(GL2.GL_TRIANGLES);
                 {
@@ -244,14 +267,7 @@ public class Terrain {
                 v1 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x + 1, y, this.getAltitude(x + 1, y));
                 v2 = MathHelper.getVector(x + 1, y + 1, this.getAltitude(x + 1, y + 1), x, y + 1, this.getAltitude(x, y + 1));
                 normal = MathHelper.crossProduct(v2, v1);
-//                gl.glBegin(GL2.GL_LINES);
-//                {
-//                    gl.glVertex3d(x + 1, y + 1, this.getAltitude(x, y));
-//                    gl.glVertex3d(x + 1 + normal[0], y + 1 + normal[1], this.getAltitude(x, y + 1) + normal[2]);
-//                }
-//                gl.glEnd();
-                
-//                System.out.println("second normal: (x,y,z): (" + normal[0] + "," + normal[1] + "," + normal[2] + ")");
+
                 gl.glBegin(GL2.GL_TRIANGLES);
                 {
                     gl.glNormal3d(normal[0], normal[1], normal[2]);
@@ -265,29 +281,20 @@ public class Terrain {
                 gl.glEnd();
             }
         }
-        
-        gl.glTranslatef(getSunlight()[0], getSunlight()[1], getSunlight()[2]);
-        gl.glColor3d(1, 1, 0);
-        Game.glut.glutSolidSphere(1, 100, 100);
-        gl.glTranslatef(-getSunlight()[0], -getSunlight()[1], -getSunlight()[2]);
-        
-        for (Tree tree : this.getTrees()) 
-        {
-            tree.display(drawable);
-        }
-        
-        for (Road road : this.getRoads())
-        {
-            road.display(drawable);
-        }
+        gl.glPopAttrib();
+        gl.glPopMatrix();
     }
 
     public void init(GLAutoDrawable drawable)
     {
         GL2 gl = drawable.getGL().getGL2();
         
-        textures = new Texture[1];
-        textures[0] = new Texture(gl, textureFileName1, textureExt1, true);
+        gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+        
+        textures = new Texture[2];
+        textures[0] = new Texture(gl, terrainTextureFileName, terrainTextureExt, true);
+        textures[1] = new Texture(gl, sunTextureFileName, sunTextureExt, true);
+        Particle.texture = new Texture(gl, Particle.textureFileName, Particle.textureExt, false);
         
         for (Tree tree : getTrees()) 
         {
@@ -300,8 +307,93 @@ public class Terrain {
             road.setTerrain(this);
             road.init(drawable);
         }
+        
+        for (int i = 0; i < particles.length; i++) 
+        {
+            particles[i] = new Particle();
+        }
     }
+    
+    /**
+     * Draw the sun
+     * @param gl
+     */
+    private void drawSun(GL2 gl)
+    {
+        calculateDynamicSunlightPosition();
+        gl.glPushMatrix();
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
+            gl.glTranslatef(getSunlight()[0], getSunlight()[1], getSunlight()[2]);
+            float[] matAmbAndDif = new float[] {1f, 0.2f, 0.0f, 1.0f};
+            float[] matSpec = new float[] { 0.2f, 0.2f, 0.0f, 1.0f };
+            float[] matShine = new float[] { 10.0f };
+            float[] emm = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
+            
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpec,0);
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShine,0);
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
+            
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[1].getTextureId());
+            Game.glut.glutSolidSphere(1, 100, 100);
+        gl.glPopAttrib();
+        gl.glPopMatrix();
+    }
+    
+    
+    /**
+     * Make it rain!
+     * @param gl
+     */
+    public void rain(GL2 gl)
+    {
+        gl.glPushMatrix();
+        gl.glTranslated(Game.avatar.getPosition()[0], Game.avatar.getPosition()[1], Game.avatar.getPosition()[2]);
+        gl.glRotated(-Game.avatar.getRotation()[0], 0, 0, 1);
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
+        
+        float matAmbAndDifL[] = {0.0f, 0.0f, 1.0f, 0.5f};
+        float matSpecL[] = { 0.0f, 0.0f, 1.0f, 0.5f };
+        float matShineL[] = { 200.0f };
+        
+        // Material properties of sphere.
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDifL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpecL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShineL,0);
 
+        // Bind texture
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, Particle.texture.getTextureId());
+        float size_x = 0.001f;
+        float size_z = 0.02f;
+        
+        for (int i = 0; i < particles.length; i++)
+        {
+            if (particles[i].active)
+            {
+                gl.glBegin(GL2.GL_QUADS);
+                {
+                    float px = particles[i].x;
+                    float py = particles[i].y;
+                    float pz = particles[i].z;
+
+                    gl.glTexCoord2d(1, 1);
+                    gl.glVertex3f(px + size_x, py, pz + size_z); // Top Right
+                    gl.glTexCoord2d(0, 1);
+                    gl.glVertex3f(px - size_x, py, pz + size_z); // Top Left
+                    gl.glTexCoord2d(0, 0);
+                    gl.glVertex3f(px - size_x, py, pz - size_z); // Bottom Left
+                    gl.glTexCoord2d(1, 0);
+                    gl.glVertex3f(px + size_x, py, pz - size_z); // Bottom Right
+                }
+                gl.glEnd();
+                
+                particles[i].move();
+            }
+        }
+        gl.glPopAttrib();
+        gl.glPopMatrix();
+    }
+    
     /**
      * Switch the lightning between dynamic and static
      */
@@ -309,6 +401,29 @@ public class Terrain {
     {
         this.dynamic_lightning = !this.dynamic_lightning;
     }
+    
+    /**
+     * Switch the rain on and off
+     */
+    public void switchRain()
+    {
+        this.isRaining = !this.isRaining;
+    }
+    
+    /**
+     * Switch between day and night mode
+     */
+    public void switchDay()
+    {
+        this.isDay = !this.isDay;
+    }
 
+    /**
+     * @return True if it is day time
+     */
+    public boolean isDay() 
+    {
+        return this.isDay;
+    }
     
 }

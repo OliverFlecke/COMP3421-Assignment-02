@@ -62,6 +62,7 @@ public class Avatar
         
         if (getViewMode() != ViewMode.FIRST_PERSON)
         {
+            gl.glPushMatrix();
             gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
             {
                 float matAmbAndDif[] = {1.0f, 0.0f, 0.0f, 1.0f};
@@ -79,6 +80,7 @@ public class Avatar
                 Game.glut.glutSolidCylinder(0.1, 1, 100, 10);
             }
             gl.glPopAttrib();
+            gl.glPopMatrix();
         }
     }
     
