@@ -40,10 +40,12 @@ public class Rain
      */
     public void run(GL2 gl)
     {
+        if (Game.avatar.getViewMode() == ViewMode.SUN) return;
+        
         gl.glPushMatrix();
         gl.glTranslated(Game.avatar.getPosition()[0], Game.avatar.getPosition()[1], Game.avatar.getPosition()[2]);
         gl.glRotated(-Game.avatar.getRotation()[0], 0, 0, 1);            
-       gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
         
         float matAmbAndDifL[] = {0.0f, 0.0f, 1.0f, 0.5f};
         float matSpecL[] = { 0.0f, 0.0f, 1.0f, 0.5f };
