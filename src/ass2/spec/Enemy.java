@@ -15,39 +15,62 @@ import com.jogamp.opengl.GLAutoDrawable;
  */
 public class Enemy extends TerrainElement 
 {
-    private float positions[] =  {0,1,-1, 
-            -1,-1,-1,
-            1,-1,-1, 
-            0, 2,-4,
-            -2,-2,-4, 
-            2,-2,-4};
+    private float positions[] =
+        {   
+            0,0,0, // 0
+            0,0,1, // 1
+            0,1,0, // 2
+            0,1,1, // 3
+            1,0,0, // 4
+            1,0,1, // 5
+            1,1,0, // 6
+            1,1,1  // 7
+        };
 
     //There should be a matching entry in this array for each entry in
     //the positions array
-    private float colors[] =     {1,0,0, 
-            0,1,0,
-            1,1,1,
-            0,0,0,
-            0,0,1, 
-            1,1,0}; 
+    private float colors[] = 
+        { 
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.7f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.7f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.7f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.7f, 0.0f
+        }; 
 
     //Best to use smallest data type possible for indexes 
     //We could even use byte here...
-    private short indexes[] = {0,1,5,3,4,2};
+    private short indexes[] = 
+        { 
+            0,6,4, // bottom
+            0,2,6,
+            3,5,7, // top
+            3,1,5,
+            4,6,7, // right
+            4,7,5,
+            4,5,1, // front
+            4,1,0,
+            0,1,3, // left
+            0,3,2,
+            2,7,6, // back
+            2,3,7
+        };
 
     //These are not vertex buffer objects, they are just java containers
-    private FloatBuffer  posData= Buffers.newDirectFloatBuffer(positions);
+    private FloatBuffer posData = Buffers.newDirectFloatBuffer(positions);
     private FloatBuffer colorData = Buffers.newDirectFloatBuffer(colors);
     private ShortBuffer indexData = Buffers.newDirectShortBuffer(indexes);
 
     //We will be using 2 vertex buffer objects
     private int bufferIds[] = new int[2];
     
+    private static final String VERTEX_SHADER = "src/ass2/spec/shaders/PhongVertex.glsl";
+    private static final String FRAGMENT_SHADER = "src/ass2/spec/shaders/PhongFragment.glsl";
     
-     private static final String VERTEX_SHADER = "src/ass2/spec/shaders/AttributeVertex.glsl";
-     private static final String FRAGMENT_SHADER = "src/ass2/spec/shaders/AttributeFragment.glsl";
-     
-     private int shaderprogram;
+    private int shaderprogram;
     
     public Enemy(double x, double y, Terrain terrain)
     {
@@ -107,7 +130,21 @@ public class Enemy extends TerrainElement
     {
         GL2 gl = drawable.getGL().getGL2();
         gl.glPushMatrix();
-        gl.glTranslated(this.getPosition()[0], this.getPosition()[1], this.getPosition()[2]);
+        gl.glPushAttrib(GL2.GL_LIGHTING);
+        gl.glScaled(0.5, 0.5, 0.5);
+        gl.glTranslated(this.getPosition()[0], this.getPosition()[1], this.getPosition()[2] + 2);
+        
+        float ambAndDif[]   = { 1.0f, 0.0f, 0.0f, 1.0f };
+        float spec[]        = { 1.0f, 0.0f, 1.0f, 1.0f };
+        float emm[]         = { 1.0f, 0.0f, 0.0f, 1.0f };
+        float shine[]       = { 100.0f };
+        
+        // Material properties of teapot
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDif,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, spec,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, shine,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
+       
         //Use the shader
         gl.glUseProgram(shaderprogram);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER,bufferIds[0]);
@@ -121,13 +158,8 @@ public class Enemy extends TerrainElement
         gl.glVertexAttribPointer(vertexPosLoc,3, GL.GL_FLOAT, false,0, 0); //last num is the offset
         gl.glVertexAttribPointer(vertexColLoc,3, GL.GL_FLOAT, false,0, positions.length*Float.BYTES);
        
-        
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, bufferIds[1]);
-     
-    
-        gl.glDrawElements(GL2.GL_TRIANGLES, 6, GL2.GL_UNSIGNED_SHORT,0);    
-        
-        
+        gl.glDrawElements(GL2.GL_TRIANGLES, 36, GL2.GL_UNSIGNED_SHORT,0);
         gl.glUseProgram(0);
            
         //Un-bind the buffer. 
@@ -135,6 +167,7 @@ public class Enemy extends TerrainElement
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER,0);
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER,0);
         
+        gl.glPopAttrib();
         gl.glPopMatrix();
     }
 }

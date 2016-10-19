@@ -1,9 +1,8 @@
 #version 130
 
 
-void main (void) {	
-    
+void main (void) 
+{
       gl_FragColor = gl_Color;
-   		
 }
 

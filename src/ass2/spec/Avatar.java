@@ -65,15 +65,15 @@ public class Avatar
             gl.glPushMatrix();
             gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
             {
-                float matAmbAndDif[] = {1.0f, 0.0f, 0.0f, 1.0f};
-                float matSpec[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-                float matShine[] = { 10.0f };
+                float ambAndDif[] = {1.0f, 0.0f, 0.0f, 1.0f};
+                float spec[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+                float shine[] = { 10.0f };
                 float emm[] = {0.0f, 0.0f, 1.0f, 1.0f};
                 
                 // Material properties of teapot
-                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
-                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpec,0);
-                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShine,0);
+                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDif,0);
+                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, spec,0);
+                gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, shine,0);
                 gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
                
                 gl.glTranslated(position[0], position[1], position[2]);

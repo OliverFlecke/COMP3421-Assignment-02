@@ -3,9 +3,11 @@
 in vec4 vertexCol;
 in vec4 vertexPos;
 
-void main(void) {
-	gl_Position=gl_ModelViewProjectionMatrix*vertexPos;
-    gl_FrontColor = vertexCol;  
+void main(void) 
+{
+	gl_Position = gl_ModelViewProjectionMatrix * vertexPos;
+    gl_FrontColor = vertexCol;
+    gl_BackColor = vertexCol;  
 }
 
 
