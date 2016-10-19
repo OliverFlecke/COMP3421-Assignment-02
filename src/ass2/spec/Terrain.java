@@ -8,7 +8,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
 /**
- *
  * @author Oliver Fleckenstein
  */
 public class Terrain
@@ -22,6 +21,7 @@ public class Terrain
     private double[][] altitude;
     private List<Tree> trees;
     private List<Road> roads;
+    private List<Enemy> enemies;
     private Texture[] textures;
     public Sun sun;
     public Rain rain;
@@ -36,6 +36,7 @@ public class Terrain
         this.altitude = new double[width][depth];
         this.trees = new ArrayList<Tree>();
         this.roads = new ArrayList<Road>();
+        this.enemies = new ArrayList<Enemy>();
         sun = new Sun(this);
         rain = new Rain(this);
     }
@@ -54,6 +55,10 @@ public class Terrain
 
     public List<Road> getRoads() {
         return this.roads;
+    }
+    
+    public List<Enemy> getEnemies() {
+        return this.enemies;
     }
     
     /**
@@ -151,32 +156,17 @@ public class Terrain
         Road road = new Road(width, spine);
         this.roads.add(road);
     }
+    
 
     /**
-     * Draw the terrain in the world
-     * @param drawable
+     * Add an enemy 
+     * @param x
+     * @param z
      */
-    public void display(GLAutoDrawable drawable) 
-    {
-        GL2 gl = drawable.getGL().getGL2();
-        
-        // Draw trees and roads
-        for (Tree tree : this.getTrees()) 
-        {
-            tree.display(drawable);
-        }
-        
-        for (Road road : this.getRoads())
-        {
-            road.display(drawable);
-        }
-        
-        sun.drawSun(gl);
-        
-        if (rain.isRaining()) { rain.run(gl); }
-        
-        drawTerrain(gl);
+    public void addEnemy(double x, double z) {
+       this.enemies.add(new Enemy(x, z));
     }
+
 
     private void drawTerrain(GL2 gl) {
         gl.glPushMatrix();
@@ -229,6 +219,31 @@ public class Terrain
     }
 
     /**
+     * Draw the terrain in the world
+     * @param drawable
+     */
+    public void display(GLAutoDrawable drawable) 
+    {
+        GL2 gl = drawable.getGL().getGL2();
+        
+        // Draw trees and roads
+        for (Tree tree : this.getTrees()) 
+            tree.display(drawable);
+        
+        for (Road road : this.getRoads())
+            road.display(drawable);
+        
+        for (Enemy enemy : this.getEnemies())
+            enemy.display(drawable);
+        
+        sun.drawSun(gl);
+        
+        if (rain.isRaining()) { rain.run(gl); }
+        
+        drawTerrain(gl);
+    }
+    
+    /**
      * Setup all components and sub-component so they are ready to be drawn
      * @param drawable
      */
@@ -253,6 +268,12 @@ public class Terrain
         {
             road.setTerrain(this);
             road.init(drawable);
+        }
+        
+        for (Enemy enemy : getEnemies())
+        {
+            enemy.setTerrain(this);
+            enemy.init(drawable);
         }
         
         rain.init(drawable);

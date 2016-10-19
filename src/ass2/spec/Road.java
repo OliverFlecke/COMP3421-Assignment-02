@@ -11,14 +11,13 @@ import com.jogamp.opengl.GLAutoDrawable;
  *
  * @author malcolmr
  */
-public class Road
+public class Road extends TerrainElement
 {
 //    private String textureFileName = "src/textures/road/tarmac.jpg";
 //    private String textureExt = "jpg";
     private String textureFileName = "src/textures/road/asphalt.png";
     private String textureExt = "png";
     private Texture texture;
-    private Terrain terrain;
     private List<Double> points;
     private double width;
     
@@ -193,8 +192,8 @@ public class Road
                 v[1] = (v[1] / length) * (getWidth() / 2);
                 
                 
-                double z0 = z_offset + this.terrain.getAltitude(point[0] - v[0], point[1] - v[1]);
-                double z1 = z_offset + this.terrain.getAltitude(point[0] + v[0], point[1] + v[1]);
+                double z0 = z_offset + this.getTerrain().getAltitude(point[0] - v[0], point[1] - v[1]);
+                double z1 = z_offset + this.getTerrain().getAltitude(point[0] + v[0], point[1] + v[1]);
 //                gl.glNormal3d(0, 0, 1);
                 gl.glTexCoord2d(0, ((10 * t) % 10) / this.size());
                 gl.glVertex3d(point[0] - v[0], point[1] - v[1], z0);
@@ -216,14 +215,5 @@ public class Road
     {
         GL2 gl = drawable.getGL().getGL2();
         texture = new Texture(gl, textureFileName, textureExt, true);
-    }
-
-    /**
-     * Set the tearrin this road is located on
-     * @param terrain
-     */
-    public void setTerrain(Terrain terrain)
-    {
-        this.terrain = terrain;
     }
 }

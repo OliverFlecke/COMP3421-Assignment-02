@@ -11,7 +11,7 @@ import com.jogamp.opengl.GLAutoDrawable;
  *
  * @author malcolmr
  */
-public class Tree 
+public class Tree extends TerrainElement
 {
     private static Random random = new Random();
     
@@ -25,7 +25,6 @@ public class Tree
     private double[] position;
     private double radius;
     private double sphereRadius;
-    private Terrain terrain;
     
     private int slices = 50;
     
@@ -127,21 +126,5 @@ public class Tree
         GL2 gl = drawable.getGL().getGL2();
         treeTexture = new Texture(gl, textureFileNameTree, textureExtTree, true);
         leafTexture = new Texture(gl, textureFileNameLeaf, textureExtLeaf, true);
-    }
-
-    /**
-     * Set the terrain which this tree is located on 
-     * @param terrain which the tree is locate on 
-     */
-    public void setTerrain(Terrain terrain) {
-        this.terrain = terrain;
-    }
-    
-    /**
-     * @return The terrain which this tree is located on
-     */
-    public Terrain getTerrain() 
-    {
-        return this.terrain;
     }
 }
