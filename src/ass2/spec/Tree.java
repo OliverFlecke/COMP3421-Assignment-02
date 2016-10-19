@@ -22,13 +22,13 @@ public class Tree extends TerrainElement
     private Texture treeTexture;
     private Texture leafTexture;
     
-    private double[] position;
     private double radius;
     private double sphereRadius;
     
     private int slices = 50;
     
-    public Tree(double x, double y, double z) {
+    public Tree(double x, double y, double z, Terrain terrain) {
+        this.setTerrain(terrain);
         this.position = new double[3];
         this.position[0] = x;
         this.position[1] = z;
@@ -36,14 +36,7 @@ public class Tree extends TerrainElement
         this.radius = 0.1 + random.nextDouble() * 0.15;
         this.sphereRadius = 0.5 + random.nextDouble() * 0.5;
     }
-    
-    /**
-     * @return The position of the tree
-     */
-    public double[] getPosition() {
-        return position;
-    }
-    
+
     /**
      * Function to display the tree
      * @param drawable

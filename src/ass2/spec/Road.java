@@ -24,7 +24,8 @@ public class Road extends TerrainElement
     /** 
      * Create a new road starting at the specified point
      */
-    public Road(double width, double x0, double y0) {
+    public Road(double width, double x0, double y0, Terrain terrain) {
+        this.setTerrain(terrain);
         this.width = width;
         points = new ArrayList<Double>();
         points.add(x0);
@@ -37,7 +38,8 @@ public class Road extends TerrainElement
      * @param width
      * @param spine
      */
-    public Road(double width, double[] spine) {
+    public Road(double width, double[] spine, Terrain terrain) {
+        this.setTerrain(terrain);
         this.width = width;
         points = new ArrayList<Double>();
         for (int i = 0; i < spine.length; i++) {

@@ -120,6 +120,8 @@ public class Shader {
     
     static public class CompilationException extends RuntimeException {
 
+        private static final long serialVersionUID = -5759460130709611401L;
+
         public CompilationException(String message) {
             super(message);
         }

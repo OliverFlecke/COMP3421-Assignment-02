@@ -141,7 +141,7 @@ public class Terrain
      */
     public void addTree(double x, double z) {
         double y = getAltitude(x, z);
-        Tree tree = new Tree(x, y, z);
+        Tree tree = new Tree(x, y, z, this);
         this.trees.add(tree);
     }
 
@@ -153,7 +153,7 @@ public class Terrain
      * @param z
      */
     public void addRoad(double width, double[] spine) {
-        Road road = new Road(width, spine);
+        Road road = new Road(width, spine, this);
         this.roads.add(road);
     }
     
@@ -164,7 +164,9 @@ public class Terrain
      * @param z
      */
     public void addEnemy(double x, double z) {
-       this.enemies.add(new Enemy(x, z));
+        Enemy enemy = new Enemy(x, z, this);
+        this.enemies.add(enemy);
+       
     }
 
 

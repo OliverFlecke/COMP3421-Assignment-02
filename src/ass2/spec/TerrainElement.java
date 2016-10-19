@@ -5,6 +5,11 @@ import com.jogamp.opengl.GLAutoDrawable;
 public abstract class TerrainElement {
 
     protected Terrain terrain;
+    protected double[] position;
+    
+    protected TerrainElement() {
+        position = new double[3];
+    }
     
     /**
      * Set the terrain which this element is a member of 
@@ -21,6 +26,14 @@ public abstract class TerrainElement {
     public Terrain getTerrain() 
     {
         return this.terrain;
+    }
+    
+    /**
+     * @return The position of this element
+     */
+    public double[] getPosition()
+    {
+        return this.position;
     }
     
     /**
