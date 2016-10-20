@@ -84,41 +84,26 @@ public class Enemy extends TerrainElement
     {
         GL2 gl = drawable.getGL().getGL2();
         
-       //Generate 2 VBO buffer and get their IDs
-        gl.glGenBuffers(2,bufferIds,0);
-       
-        //This buffer is now the current array buffer
-        //array buffers hold vertex attribute data
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER,bufferIds[0]);
-     
-        //This is just setting aside enough empty space
-        //for all our data
-        gl.glBufferData(GL2.GL_ARRAY_BUFFER,    //Type of buffer  
-                   positions.length * Float.BYTES +  colors.length* Float.BYTES, //size needed
-                   null,    //We are not actually loading data here yet
-                   GL2.GL_STATIC_DRAW); //We expect once we load this data we will not modify it
+        gl.glGenBuffers(2, bufferIds, 0);
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, bufferIds[0]);
+        // Allocate memory
+        gl.glBufferData(GL2.GL_ARRAY_BUFFER, positions.length * Float.BYTES + colors.length* Float.BYTES, 
+                   null, GL2.GL_STATIC_DRAW);
+        // Load the position data
+        gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, positions.length*Float.BYTES,posData);
 
-        //Actually load the positions data
-        gl.glBufferSubData(GL2.GL_ARRAY_BUFFER, 0, //From byte offset 0
-                positions.length*Float.BYTES,posData);
-
-        //Actually load the color data
+        // Load the color data
         gl.glBufferSubData(GL2.GL_ARRAY_BUFFER,
                 positions.length*Float.BYTES,  //Load after the position data
                 colors.length*Float.BYTES,colorData);
         
-        //Now for the element array
-        //Element arrays hold indexes to an array buffer
+        // Allocate and load index data
         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, bufferIds[1]);
-
-        //We can load it all at once this time since there are not
-        //two separate parts like there was with color and position.
-        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER,      
-               indexes.length *Short.BYTES,
+        gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, indexes.length * Short.BYTES,
                indexData, GL2.GL_STATIC_DRAW);
                 
         try {
-            shaderprogram = Shader.initShaders(gl,VERTEX_SHADER,FRAGMENT_SHADER);
+            shaderprogram = Shader.initShaders(gl, VERTEX_SHADER,FRAGMENT_SHADER);
         }
         catch (Exception e) {
             e.printStackTrace();
