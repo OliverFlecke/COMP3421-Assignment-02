@@ -56,7 +56,7 @@ public class Shader {
     }
 
     public void compile(GL2 gl) {
-    	printShader(); //debugging       
+//    	printShader(); //debugging       
     	myID = gl.glCreateShader(myType);
         gl.glShaderSource(myID, 1, mySource, new int[] { mySource[0].length() }, 0);
         gl.glCompileShader(myID);

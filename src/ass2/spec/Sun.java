@@ -14,7 +14,8 @@ public class Sun
     private final float[] dayLight = { 1.0f, 0.75f, 0.0f, 1.0f };
     private final float[] nightLight = { 0.0f, 0.0f, 0.5f, 1.0f };
     private final float[] ambientLight = { 0.25f, 0.5f, 0.0f, 1.0f };
-    private float timeInterval = -0.001f;
+    private final float TIME_STEP = 0.01f;
+    private float timeInterval = -TIME_STEP;
     private float timeOfDay = 1;
     
     private boolean isTimeDynamic = false;
@@ -26,7 +27,6 @@ public class Sun
     private float light_radius = 10f;
     private float[] staticPosition;
     private boolean dynamicPosition = true;
-    private boolean isDay = true;
     
     Terrain terrain;
     
@@ -130,22 +130,6 @@ public class Sun
     {
         this.dynamicPosition = !this.dynamicPosition;
     }
-    
-    /**
-     * Switch between day and night mode
-     */
-    public void switchDay()
-    {
-        this.isDay = !this.isDay;
-    }
-    
-    /**
-     * @return True if it is day time
-     */
-    public boolean isDay() 
-    {
-        return this.isDay;
-    }
 
     /**
      * @return The ambient light of the sun
@@ -183,8 +167,27 @@ public class Sun
     /**
      * @return If the is running or not
      */
-    public boolean getIsTimeDynamic() {
+    public boolean isTimeDynamic() {
         return this.isTimeDynamic;
+    }
+    
+    /**
+     * Set day mode 
+     */
+    public void setDayMode()
+    {
+        this.timeOfDay = 1;
+        this.timeInterval = -TIME_STEP;
+        if (isTimeDynamic())
+            switchTimeDynamic();
+    }
+    
+    public void setNightMode()
+    {
+        this.timeOfDay = 0;
+        this.timeInterval = TIME_STEP;
+        if (isTimeDynamic())
+            switchTimeDynamic();
     }
     
     /**

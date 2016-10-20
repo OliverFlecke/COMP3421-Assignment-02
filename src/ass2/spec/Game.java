@@ -271,13 +271,16 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
                 terrain.sun.switchLightning();
                 break;
             case KeyEvent.VK_D:
-                terrain.sun.switchDay();
+                terrain.sun.setDayMode();
+                break;
+            case KeyEvent.VK_N:
+                terrain.sun.setNightMode();
+                break;
+            case KeyEvent.VK_S:
+                terrain.sun.switchTimeDynamic();
                 break;
             case KeyEvent.VK_C:
                 terrain.rain.switchRain();
-                break;
-            case KeyEvent.VK_N:
-                terrain.sun.switchTimeDynamic();
                 break;
             case KeyEvent.VK_F:
                 fog = !fog;

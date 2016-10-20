@@ -249,7 +249,7 @@ public class Terrain
         gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
         gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
         
-        if (sun.getIsTimeDynamic())
+        if (sun.isTimeDynamic())
             sun.tickTimeOfDay();
     }
     
