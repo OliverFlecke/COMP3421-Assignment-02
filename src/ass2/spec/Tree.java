@@ -25,7 +25,7 @@ public class Tree extends TerrainElement
     private double radius;
     private double sphereRadius;
     
-    private int slices = 50;
+    private int slices = 100;
     
     public Tree(double x, double y, double z, Terrain terrain) {
         this.setTerrain(terrain);
@@ -62,18 +62,15 @@ public class Tree extends TerrainElement
         
         // Push a matrix so you don't have to calculate the position
         gl.glPushMatrix();
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
         gl.glTranslated(x, y, 0);
         
-        float emmL[] = {0.0f, 0.0f, 0.0f, 1.0f};
-        float matAmbAndDifL[] = {0.25f, 0.5f, 0.25f, 0.5f};
-        float matSpecL[] = { 0.2f, 0.5f, 0.2f, 1.0f };
-        float matShineL[] = { 50.0f };
+        float ambAndDifL[] = {0.1f, 0.25f, 0.1f, 0.5f};
+        float specL[] = { 0.2f, 0.5f, 0.2f, 1.0f };
 
         // Material properties of sphere.
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDifL,0);
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, matSpecL,0);
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, matShineL,0);
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emmL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDifL,0);
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, specL,0);
         
         
         gl.glPolygonMode(GL2.GL_BACK, GL2.GL_LINE);
@@ -106,11 +103,12 @@ public class Tree extends TerrainElement
             gl.glEnable(GL2.GL_TEXTURE_GEN_S); //enable texture coordinate generation
             gl.glEnable(GL2.GL_TEXTURE_GEN_T);
             gl.glBindTexture(GL2.GL_TEXTURE_2D, leafTexture.getTextureId());
-            Game.glut.glutSolidSphere(sphereRadius, 40, 40);
+            Game.glut.glutSolidSphere(sphereRadius, slices, 40);
             gl.glDisable(GL2.GL_TEXTURE_GEN_S); //enable texture coordinate generation
             gl.glDisable(GL2.GL_TEXTURE_GEN_T);
         gl.glPopMatrix();
         
+        gl.glPopAttrib();
         gl.glPopMatrix();
     }
     

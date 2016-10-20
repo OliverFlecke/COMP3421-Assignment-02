@@ -174,6 +174,7 @@ public class Terrain
         gl.glPushMatrix();
         gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
         float matAmbAndDif[] = {0.5f, 0.75f, 0.5f, 0.5f};
+//        float matAmbAndDif[] = { 1,0,0,0 };
         
         // Material properties of teapot
         gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
@@ -221,12 +222,46 @@ public class Terrain
     }
 
     /**
+     * Setup the light properly.
+     * This also calculates the moving/dynamic lightning if it is enabled
+     * @param gl
+     */
+    public void setUpLighting(GL2 gl) 
+    {
+        // Set the sky color (clear color) based on time of day
+        float[] clearColor = sun.getSkyColor();
+        gl.glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+        
+        // Light property vectors.
+//        float lightAmb[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+//        float lightDifAndSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        float lightAmb[] = sun.getAmbientLight();
+        float lightDifAndSpec[] = sun.getLight();
+        float globAmb[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        
+        gl.glEnable(GL2.GL_LIGHT0);
+        // Set light properties.
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, sun.getPosition(), 0);
+        
+        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
+        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
+        
+        if (sun.getIsTimeDynamic())
+            sun.tickTimeOfDay();
+    }
+    
+    /**
      * Draw the terrain in the world
      * @param drawable
      */
     public void display(GLAutoDrawable drawable) 
     {
         GL2 gl = drawable.getGL().getGL2();
+        
+        setUpLighting(gl);
         
         // Draw trees and roads
         for (Tree tree : this.getTrees()) 
@@ -252,6 +287,11 @@ public class Terrain
     public void init(GLAutoDrawable drawable)
     {
         GL2 gl = drawable.getGL().getGL2();
+        
+        // Enable lighting
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_LIGHT0);
+//        gl.glEnable(GL2.GL_NORMALIZE);
         
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
         

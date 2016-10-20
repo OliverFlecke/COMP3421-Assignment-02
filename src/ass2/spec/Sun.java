@@ -9,6 +9,16 @@ public class Sun
     private String sunTextureExt = "jpg";
     private Texture texture;
     
+    private final float[] daySky = { 0, 0, 0.8f, 1.0f };
+    private final float[] nightSky = { 0, 0, 0, 0 };
+    private final float[] dayLight = { 1.0f, 0.75f, 0.0f, 1.0f };
+    private final float[] nightLight = { 0.0f, 0.0f, 0.5f, 1.0f };
+    private final float[] ambientLight = { 0.25f, 0.5f, 0.0f, 1.0f };
+    private float timeInterval = -0.001f;
+    private float timeOfDay = 1;
+    
+    private boolean isTimeDynamic = false;
+    
     // Variables for lightning
     private float[] dynamic_sunlight;
     private int light_slices = 250;
@@ -72,6 +82,18 @@ public class Sun
     }
     
     /**
+     * Tick the time of day
+     */
+    public void tickTimeOfDay() 
+    {
+        timeOfDay += timeInterval;
+        if (timeOfDay >= 1 || timeOfDay <= 0) 
+        {
+            timeInterval = -timeInterval;
+        }
+    }
+    
+    /**
      * @return The current position of the sun
      */
     public float[] getPosition() {
@@ -123,5 +145,53 @@ public class Sun
     public boolean isDay() 
     {
         return this.isDay;
+    }
+
+    /**
+     * @return The ambient light of the sun
+     */
+    public float[] getAmbientLight() {
+        return this.ambientLight;
+    }
+
+    /**
+     * @return The light currently coming from the sun 
+     */
+    public float[] getLight() {
+        float[] light = { 
+                timeOfDay * dayLight[0] + (1 - timeOfDay) * nightLight[0], 
+                timeOfDay * dayLight[1] + (1 - timeOfDay) * nightLight[1],
+                timeOfDay * dayLight[2] + (1 - timeOfDay) * nightLight[2],
+                timeOfDay * dayLight[3] + (1 - timeOfDay) * nightLight[3]
+                };
+        return light;
+    }
+
+    /**
+     * @return The color of the sky
+     */
+    public float[] getSkyColor() {
+        float[] sky = {
+                timeOfDay * daySky[0] + (1 - timeOfDay) * nightSky[0],
+                timeOfDay * daySky[1] + (1 - timeOfDay) * nightSky[1],
+                timeOfDay * daySky[2] + (1 - timeOfDay) * nightSky[2],
+                timeOfDay * daySky[3] + (1 - timeOfDay) * nightSky[3]
+        };
+        return sky;
+    }
+
+    /**
+     * @return If the is running or not
+     */
+    public boolean getIsTimeDynamic() {
+        return this.isTimeDynamic;
+    }
+    
+    /**
+     * Switch between dynamic and stacit time mode
+     */
+    public void switchTimeDynamic() 
+    {
+        this.isTimeDynamic = !this.isTimeDynamic;
     }
 }

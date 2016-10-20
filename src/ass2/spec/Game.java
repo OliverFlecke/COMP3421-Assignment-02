@@ -130,17 +130,12 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
 	public void display(GLAutoDrawable drawable) 
 	{
 	    GL2 gl = drawable.getGL().getGL2();
-        if (terrain.sun.isDay()) 
-            gl.glClearColor(0f, 0f, 1f, 1f);
-        else
-            gl.glClearColor(0f, 0f, 0f, 0f);
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);	    
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         
         setupCamera(gl);
         
 //        drawCoordinateAxis(gl);
-
-        setUpLighting(gl);
+        
         avatar.display(drawable);
         this.terrain.display(drawable);
     }
@@ -242,7 +237,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
             gl.glFogi(GL2.GL_FOG_MODE, GL2.GL_LINEAR);
         }
         
-        
         // Makes sure that the objects are drawn in the right order
         gl.glEnable(GL2.GL_DEPTH_TEST);
         // To turn on culling:
@@ -250,14 +244,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
         gl.glCullFace(GL2.GL_BACK);
         gl.glEnable( GL2.GL_POLYGON_OFFSET_FILL);
         gl.glEnable(GL2.GL_BLEND); 
-        // enable lighting
-        gl.glEnable(GL2.GL_LIGHTING);
-        gl.glEnable(GL2.GL_LIGHT0);
-//        gl.glEnable(GL2.GL_NORMALIZE);
-        
-//        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_DIFFUSE);
-//        gl.glEnable(GL2.GL_COLOR_MATERIAL);
-
         
         gl.glEnable(GL2.GL_TEXTURE_2D);
         glu = new GLU();
@@ -268,28 +254,6 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
     
-    /**
-     * Setup the light properly.
-     * This also calculates the moving/dynamic lightning if it is enabled
-     * @param gl
-     */
-    public void setUpLighting(GL2 gl) 
-    {
-        // Light property vectors.
-        float lightAmb[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-        float lightDifAndSpec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        float globAmb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-        
-        gl.glEnable(GL2.GL_LIGHT0);
-        // Set light properties.
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, lightAmb,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDifAndSpec,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, lightDifAndSpec,0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, terrain.sun.getPosition(), 0);
-        
-        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
-        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
-    }
 
     @Override
     public void keyPressed(KeyEvent e) 
@@ -311,6 +275,9 @@ public class Game extends JFrame implements GLEventListener, KeyListener, MouseM
                 break;
             case KeyEvent.VK_C:
                 terrain.rain.switchRain();
+                break;
+            case KeyEvent.VK_N:
+                terrain.sun.switchTimeDynamic();
                 break;
             case KeyEvent.VK_F:
                 fog = !fog;

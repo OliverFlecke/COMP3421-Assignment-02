@@ -130,7 +130,7 @@ public class Enemy extends TerrainElement
     {
         GL2 gl = drawable.getGL().getGL2();
         gl.glPushMatrix();
-        gl.glPushAttrib(GL2.GL_LIGHTING);
+        gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
         gl.glScaled(0.5, 0.5, 0.5);
         gl.glTranslated(this.getPosition()[0], this.getPosition()[1], this.getPosition()[2] + 2);
         
