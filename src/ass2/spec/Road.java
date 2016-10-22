@@ -13,10 +13,10 @@ import com.jogamp.opengl.GLAutoDrawable;
  */
 public class Road extends TerrainElement
 {
-//    private String textureFileName = "src/textures/road/tarmac.jpg";
-//    private String textureExt = "jpg";
-    private String textureFileName = "src/textures/road/asphalt.png";
-    private String textureExt = "png";
+    private String textureFileName = "src/textures/road/tarmac.jpg";
+    private String textureExt = "jpg";
+//    private String textureFileName = "src/textures/road/asphalt.png";
+//    private String textureExt = "png";
     private Texture texture;
     private List<Double> points;
     private double width;
