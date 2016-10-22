@@ -60,27 +60,6 @@ public class Avatar
     {
         GL2 gl = drawable.getGL().getGL2();
         
-//        float[] lightAmb = { 1, 1, 1, 1 };
-//        float[] lightDifAndSpec = { 1, 0, 0, 1 };
-//        
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_AMBIENT, lightAmb,0);
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_DIFFUSE, lightDifAndSpec,0);
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPECULAR, lightDifAndSpec,0);
-//        float[] lightPos = new float[] { (float) this.getPosition()[0], (float) this.getPosition()[1], (float) this.getPosition()[2] };
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, lightPos, 0);
-//        
-////        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
-//        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
-//        
-//        gl.glLightf(GL2.GL_LIGHT1, GL2.GL_SPOT_CUTOFF, 10.0f); 
-//        gl.glLightf(GL2.GL_LIGHT1, GL2.GL_LINEAR_ATTENUATION, 1.0f);
-//        float[] rightspotlight = { 1, 1, 1, 1 };
-//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPOT_EXPONENT, rightspotlight, 1);
-//        gl.glShadeModel(GL2.GL_SMOOTH);
-//        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); 
-//        gl.glEnable(GL2.GL_LIGHT1);
-        
-        
         if (getViewMode() != ViewMode.FIRST_PERSON)
         {
             gl.glPushMatrix();
