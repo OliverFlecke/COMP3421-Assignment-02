@@ -11,9 +11,9 @@ public class Sun
     
     private final float[] daySky = { 0, 0, 0.8f, 1.0f };
     private final float[] nightSky = { 0, 0, 0, 0 };
-    private final float[] dayLight = { 1.0f, 0.75f, 0.0f, 1.0f };
+    private final float[] dayLight = { 1.0f, 1.0f, 1.0f, 1.0f };
     private final float[] nightLight = { 0.0f, 0.0f, 0.5f, 1.0f };
-    private final float[] ambientLight = { 0.25f, 0.5f, 0.0f, 1.0f };
+    private final float[] ambientLight = { 0.5f, 0.5f, 0.5f, 1.0f };
     private final float TIME_STEP = 0.01f;
     private float timeInterval = -TIME_STEP;
     private float timeOfDay = 1;

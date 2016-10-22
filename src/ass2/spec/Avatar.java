@@ -60,15 +60,36 @@ public class Avatar
     {
         GL2 gl = drawable.getGL().getGL2();
         
+//        float[] lightAmb = { 1, 1, 1, 1 };
+//        float[] lightDifAndSpec = { 1, 0, 0, 1 };
+//        
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_AMBIENT, lightAmb,0);
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_DIFFUSE, lightDifAndSpec,0);
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPECULAR, lightDifAndSpec,0);
+//        float[] lightPos = new float[] { (float) this.getPosition()[0], (float) this.getPosition()[1], (float) this.getPosition()[2] };
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, lightPos, 0);
+//        
+////        gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, globAmb,0); // Global ambient light.
+//        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); // Enable two-sided lighting.
+//        
+//        gl.glLightf(GL2.GL_LIGHT1, GL2.GL_SPOT_CUTOFF, 10.0f); 
+//        gl.glLightf(GL2.GL_LIGHT1, GL2.GL_LINEAR_ATTENUATION, 1.0f);
+//        float[] rightspotlight = { 1, 1, 1, 1 };
+//        gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPOT_EXPONENT, rightspotlight, 1);
+//        gl.glShadeModel(GL2.GL_SMOOTH);
+//        gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE); 
+//        gl.glEnable(GL2.GL_LIGHT1);
+        
+        
         if (getViewMode() != ViewMode.FIRST_PERSON)
         {
             gl.glPushMatrix();
             gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
             {
-                float ambAndDif[] = {1.0f, 0.0f, 0.0f, 1.0f};
-                float spec[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-                float shine[] = { 10.0f };
-                float emm[] = {0.0f, 0.0f, 1.0f, 1.0f};
+                float[] ambAndDif = { 0.25f, 0.0f, 0.0f, 1.0f};
+                float[] spec = { 0.25f, 0.0f, 0.0f, 1.0f };
+                float[] shine = { 10.0f };
+                float[] emm = {0.0f, 0.0f, 1.0f, 1.0f};
                 
                 // Material properties of teapot
                 gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDif,0);
@@ -77,7 +98,24 @@ public class Avatar
                 gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
                
                 gl.glTranslated(position[0], position[1], position[2]);
-                Game.glut.glutSolidCylinder(0.1, 1, 100, 10);
+                Game.glut.glutSolidCone(0.2, 1, 100, 10); 
+                gl.glPushMatrix();
+                    gl.glTranslated(0, 0, 1);
+                    
+                    ambAndDif = new float[] { 1f, 1f, 1.0f, 1.0f};
+                    spec = new float[] { 1.0f, 0.75f, 0.0f, 1.0f };
+                    shine = new float[] { 1000.0f };
+                    emm = new float[] { 0.0f, 0.0f, 0.0f, 1.0f};
+                    
+                    // Material properties of teapot
+                    gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDif,0);
+                    gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, spec,0);
+                    gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SHININESS, shine,0);
+                    gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_EMISSION, emm,0);
+                   
+                    
+                    Game.glut.glutSolidSphere(0.25, 100, 10);
+                gl.glPopMatrix();
             }
             gl.glPopAttrib();
             gl.glPopMatrix();

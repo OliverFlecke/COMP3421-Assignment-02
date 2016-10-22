@@ -67,8 +67,8 @@ public class Enemy extends TerrainElement
     //We will be using 2 vertex buffer objects
     private int bufferIds[] = new int[2];
     
-    private static final String VERTEX_SHADER = "src/ass2/spec/shaders/PhongVertex.glsl";
-    private static final String FRAGMENT_SHADER = "src/ass2/spec/shaders/PhongFragment.glsl";
+    private static final String VERTEX_SHADER = "src/ass2/spec/shaders/SphereVertex.glsl";
+    private static final String FRAGMENT_SHADER = "src/ass2/spec/shaders/SphereFragment.glsl";
     
     private int shaderprogram;
     

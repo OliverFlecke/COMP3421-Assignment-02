@@ -173,11 +173,10 @@ public class Terrain
     private void drawTerrain(GL2 gl) {
         gl.glPushMatrix();
         gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
-        float matAmbAndDif[] = {0.5f, 0.75f, 0.5f, 0.5f};
-//        float matAmbAndDif[] = { 1,0,0,0 };
-        
-        // Material properties of teapot
-        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, matAmbAndDif,0);
+
+        // Material properties of the terrain
+        float ambAndDif[] = {0.5f, 0.75f, 0.5f, 0.5f};
+        gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, ambAndDif,0);
      
         // Load the texture
         gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[0].getTextureId());

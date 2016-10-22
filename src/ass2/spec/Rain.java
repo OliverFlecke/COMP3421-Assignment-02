@@ -47,7 +47,7 @@ public class Rain
         gl.glRotated(-Game.avatar.getRotation()[0], 0, 0, 1);            
         gl.glPushAttrib(GL2.GL_LIGHTING_BIT);
         
-        float matAmbAndDifL[] = {0.0f, 0.0f, 1.0f, 0.5f};
+        float matAmbAndDifL[] = {0.0f, 0.0f, 1.0f, 0.75f};
         float matSpecL[] = { 0.0f, 0.0f, 1.0f, 0.5f };
         float matShineL[] = { 200.0f };
         
